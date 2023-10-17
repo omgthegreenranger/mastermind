@@ -1,0 +1,67 @@
+:root {
+    --colour1: red;
+    --colour2: orange;
+    --colour3: yellow;
+    --colour4: green;
+    --colour5: blue;
+    --colour6: violet;
+}
+
+.options {
+    display: flex;
+}
+.colour-options {
+    display: flex;
+    list-style-type: none;
+}
+
+.colour {
+    padding: 10px;
+    width:100%;
+}
+
+.choice {
+    border: 1px solid blue;
+    width:100%;
+    background-color: grey;
+
+}
+
+/* #selector-modal {
+    display: none;
+} */
+
+/* #choice1 {
+}
+
+#choice2 {
+
+}
+
+#choice3 {
+
+}
+
+#choice4 {
+
+} */
+
+
+
+#colour1 { 
+    background-color: var(--colour1);}
+
+#colour2 { 
+    background-color: var(--colour2);}
+
+#colour3 { 
+    background-color: var(--colour3);}
+
+#colour4 { 
+    background-color: var(--colour4);}
+
+#colour5 { 
+    background-color: var(--colour5);}
+
+#colour6 { 
+    background-color: var(--colour6);}
