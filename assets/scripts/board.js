@@ -1,3 +1,8 @@
+// set arrays for game.
+
+const codemaker = [];
+const codebreaker = [];
+
 // set 6 colours
 let colour1 = getComputedStyle(document.documentElement).getPropertyValue(
   "--colour1"
@@ -39,52 +44,43 @@ let submitRow = [choice1, choice2, choice3, choice4];
 
 // set Codemaker code from 6 colours:
 
-const codemaker = [];
-
 function codeMaker() {
   for (i = 0; i < 4; i++) {
-    let codeChoice = "--colour" + (Math.floor(Math.random() * 4) + 1);
+    let codeChoice = "--colour" + (Math.floor(Math.random() * 6) + 1);
     getComputedStyle(document.documentElement).getPropertyValue(codeChoice);
     codemaker.push(codeChoice);
   }
 }
 
-// create Codebreaker board for round.
-//  - click on square, choose colour options.
-//  - button to submit.
-
-const codebreaker = [];
-
-function handlePick() {    
-    console.log(event.target.previousSibling.previousSibling.style)
-    let boardBox = event.target.previousSibling.previousSibling;
-    boardBox.style.setProperty("background-color", `var(${event.target.value})`)
+function handlePick() {
+  // console.log(event.target.previousSibling.previousSibling.style);
+  let boardBox = event.target.previousSibling.previousSibling;
+  boardBox.style.setProperty("background-color", `var(${event.target.value})`);
 }
 
 function codeBreaker() {
   let roundChoice = [];
-  let choiceBoxes = document.getElementById("choiceBox")
-  console.log(choiceBoxes)
-  choiceBoxes.addEventListener("input", handlePick)
-  document.getElementById("submit").addEventListener("click", () => handleSubmit())
+  let choiceBoxes = document.getElementById("choiceBox");
+  // console.log(choiceBoxes);
+  choiceBoxes.addEventListener("input", handlePick);
+  document
+    .getElementById("submit")
+    .addEventListener("click", () => handleSubmit());
 }
 
 function handleSubmit() {
-  console.log("Hello!")
-  console.log(event.target.previousSibling)
-  let sel_Array = document.getElementsByName("colour-select")
-  let sel_Colours = []
+  // console.log("Hello!");
+  // console.log(event.target.previousSibling);
+  let sel_Array = document.getElementsByName("colour-select");
+  let sel_Colours = [];
   for (i = 0; i < sel_Array.length; i++) {
-    sel_Colours.push(sel_Array[i].value)
+    sel_Colours.push(sel_Array[i].value);
   }
-  codebreaker.push(sel_Colours)
-  console.log(sel_Colours)
-
-  console.log(codebreaker)
-
-  // codebreaker.push({})
+  let scorelist = codeChecker(sel_Colours);
+  codebreaker.push([sel_Colours, scorelist]);
+  // console.log(codebreaker);
+  scoreBoard(codebreaker);
 }
-
 
 // this script opens the colour-selection modal, which is aesthetic we are going to put on hold until the rest functions
 
@@ -98,21 +94,106 @@ function handleSubmit() {
 //         console.log("Clicked!")});
 // }
 
-
-
 // Codemaker scores board:
 // - for each correct colour in correct place - white dot.
 // - for each correct colour in incorrect place - red dot.
+
+function codeChecker(colours) {
+  const score = [];
+  colours.foreach(
+    codemaker.foreach(
+      if 
+    )
+  )
+  for (let i = 0; i < colours.length; i++) {
+    for (let j = 0; j < codemaker.length; j++) {
+      if (colours[i] === codemaker[j]) {
+        if (i === j) {
+          console.log(
+            colours[i] +
+              " and " +
+              codemaker[j] +
+              "match in place" +
+              "Guess position " +
+              i +
+              ", maker position " +
+              j
+          );
+          score.push(2);
+          console.log(score);
+          break;
+        } else {
+          console.log(
+            colours[i] +
+              " is in position " +
+              i +
+              ", but " +
+              codemaker[j] +
+              "is in position " +
+              j
+          );
+          score.push(1);
+          break;
+        }
+      } else {
+        console.log(colours[i], "Cannot find this one!", i, j);
+        score.push(0);
+        return;
+      }
+    }
+    // return
+  }
+
+  return score;
+}
+
+function scoreBoard(codebreaker) {
+  let rounds = document.getElementById('rounds')
+  let scoreRound = codebreaker.length;
+  let scoredraft = codebreaker[(scoreRound-1)]
+  let scoreColours = scoredraft[0];
+  let scoreTick = scoredraft[1];
+  console.log(codebreaker)
+  console.log(scoredraft)
+  console.log(scoreColours)
+  console.log(scoreTick)
+  function scoreTicker(tick) {
+    if (tick === 2) {
+      return "background-color: white"
+    } else if (tick === 1) {
+      return "background-color: red"
+    } else {
+      return "display: none"
+    }
+    
+  }
+  rounds.innerHTML += `<div class="colour-options">
+    <div>Round ${scoreRound}</div>
+    <div class="colour choice" style="background-color: var(${scoreColours[0]})">Hello</div>
+    <div class="colour choice" style="background-color: var(${scoreColours[1]})">Hello</div>
+    <div class="colour choice" style="background-color: var(${scoreColours[2]})">Hello</div>
+    <div class="colour choice" style="background-color: var(${scoreColours[3]})">Hello</div>
+    </div>
+    <div class="scoreTick">
+    <div class="tick" style="${scoreTicker(scoreTick[0])}">${scoreTick[0]}</div>
+    <div class="tick" style="${scoreTicker(scoreTick[1])}">${scoreTick[1]}</div>
+    <div class="tick" style="${scoreTicker(scoreTick[2])}">${scoreTick[2]}</div>
+    <div class="tick" style="${scoreTicker(scoreTick[3])}">${scoreTick[3]}</div>
+    <div
+    </div>
+    `
+}
+
 
 // generate next board
 
 // repeat 12 times.
 
 function init() {
-    codeMaker();
-    codeBreaker();
-};
+  codeMaker();
+  codeBreaker();
+}
 
 init();
 
-console.log(codemaker)
+console.log(codemaker);
