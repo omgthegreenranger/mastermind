@@ -23,7 +23,7 @@ let colour6 = getComputedStyle(document.documentElement).getPropertyValue(
   "--colour6"
 );
 
-let colours = [colour1, colour2, colour3, colour4, colour5, colour6];
+let base_colours = [colour1, colour2, colour3, colour4, colour5, colour6];
 
 // code has 4 pegs
 
@@ -76,103 +76,168 @@ function handleSubmit() {
   for (i = 0; i < sel_Array.length; i++) {
     sel_Colours.push(sel_Array[i].value);
   }
-  let scorelist = codeChecker(sel_Colours);
+  let scorelist = codeScorer(sel_Colours);
   codebreaker.push([sel_Colours, scorelist]);
-  // console.log(codebreaker);
+  console.log(scorelist);
   scoreBoard(codebreaker);
 }
-
-// this script opens the colour-selection modal, which is aesthetic we are going to put on hold until the rest functions
-
-// function selectBox(event, choice, selector) {
-//     console.log(event.target.id);
-//     console.log(selector)
-//     console.log(choice)
-//     document.getElementById("selector-modal").style.setProperty("display", "none");
-//     document.getElementById(choice).style.setProperty("background-color", `var(--${event.target.id})`);
-//     selector.removeEventListener("click", () => {selectBox(event, choiceBox.id, selector);
-//         console.log("Clicked!")});
-// }
 
 // Codemaker scores board:
 // - for each correct colour in correct place - white dot.
 // - for each correct colour in incorrect place - red dot.
 
-function codeChecker(colours) {
-  const score = [];
-  colours.foreach(
-    codemaker.foreach(
-      if 
-    )
-  )
-  for (let i = 0; i < colours.length; i++) {
-    for (let j = 0; j < codemaker.length; j++) {
-      if (colours[i] === codemaker[j]) {
-        if (i === j) {
-          console.log(
-            colours[i] +
-              " and " +
-              codemaker[j] +
-              "match in place" +
-              "Guess position " +
-              i +
-              ", maker position " +
-              j
-          );
-          score.push(2);
-          console.log(score);
-          break;
-        } else {
-          console.log(
-            colours[i] +
-              " is in position " +
-              i +
-              ", but " +
-              codemaker[j] +
-              "is in position " +
-              j
-          );
-          score.push(1);
-          break;
-        }
-      } else {
-        console.log(colours[i], "Cannot find this one!", i, j);
-        score.push(0);
-        return;
-      }
+function codeScorer(code_colours) {
+  let score = [];
+  let match = [];
+  code_colours.forEach((colour, i) => {
+    console.log(colour, i, "Scorer")
+    let scoreMatch = codeMatcher(colour, code_colours, i);
+    console.log(scoreMatch)
+    match.push({colour, scoreMatch})
+    return;
+  });
+  console.log(match)
+}
+function codeMatcher(colour, code_colours, i) {
+  console.log(colour, code_colours, i);
+  var matched = [];
+  // if position > 0, then compare to previous positions
+  // if matches a previous position, skip first result; otherwise calculate correctly
+  if(i === 0) { console.log("We skip this one"); return }
+  for (let k = 0; k < i; k++) {
+    if (colour === code_colours[k]) {
+      // console.log("Yes!", code_colours[k], colour, k, "pushing " + k
+      // )
+      matched.push(k)
     }
-    // return
+    if (colour != code_colours[k]) {
+      console.log("No~!", code_colours[k], colour, k)
+      continue
+    }
+  }
+  console.log(colour, matched)
+  return matched
   }
 
+
+function codeChecker(matched, colour, i) {
+  console.log(matched, i);
+  console.log(colour);
+  const score = "";
+  for (j = 0; j > codemaker.length; j++) {
+    if (colour === codemaker[j] && i === j) {
+      score = 2;
+      console.log(
+        colour +
+          " and " +
+          code +
+          "match in place" +
+          "Guess position " +
+          i +
+          ", maker position " +
+          j
+      );
+      console.log("Pushing 2 for " + colour, code);
+    } else if (colour === code && i != j) {
+      score = 1;
+      console.log(
+        colour +
+          " is in position " +
+          i +
+          ", but " +
+          code +
+          "is in position " +
+          j
+      );
+      console.log("Pushing 1 for " + colour, code);
+    } else {
+      score = 0;
+    }
+  }
+
+  // codemaker.every((code, j) => {
+  // if (colour === code && i != j) {
+  //   score.push(1)
+  //   console.log(
+  //     colour +
+  //       " is in position " +
+  //       i +
+  //       ", but " +
+  //       code +
+  //       "is in position " +
+  //       j
+  //   );
+  //   } else {
+  //     score.push(0);
+  //     console.log("this does not match")
+
+  // codemaker.every((code, j) => {
+  //   console.log(code)
+  //   if (colour === code && i === j) {
+  //     score.push(2)
+  //     console.log(colour +
+  //       " and " +
+  //       code +
+  //       "match in place" +
+  //       "Guess position " +
+  //       i +
+  //       ", maker position " +
+  //       j)
+
+  //   } else if (colour === code && i != j) {
+  //     score.push(1)
+  //     console.log(
+  //       colour +
+  //         " is in position " +
+  //         i +
+  //         ", but " +
+  //         code +
+  //         "is in position " +
+  //         j
+  //     );
+  //   } else {
+  //     score.push(0);
+  //     console.log("this does not match")
+  //   }
+  // });
+
+  console.log(score);
   return score;
 }
 
 function scoreBoard(codebreaker) {
-  let rounds = document.getElementById('rounds')
+  let rounds = document.getElementById("rounds");
   let scoreRound = codebreaker.length;
-  let scoredraft = codebreaker[(scoreRound-1)]
+  let scoredraft = codebreaker[scoreRound - 1];
   let scoreColours = scoredraft[0];
   let scoreTick = scoredraft[1];
-  console.log(codebreaker)
-  console.log(scoredraft)
-  console.log(scoreColours)
-  console.log(scoreTick)
+  // console.log(codebreaker);
+  // console.log(scoredraft);
+  // console.log(scoreColours);
+  // console.log(scoreTick);
   function scoreTicker(tick) {
     if (tick === 2) {
-      return "background-color: white"
+      return "background-color: white";
     } else if (tick === 1) {
-      return "background-color: red"
+      return "background-color: red";
     } else {
-      return "display: none"
+      return "display: none";
     }
-    
   }
   rounds.innerHTML += `<div class="colour-options">
     <div>Round ${scoreRound}</div>
-    <div class="colour choice" style="background-color: var(${scoreColours[0]})">Hello</div>
-    <div class="colour choice" style="background-color: var(${scoreColours[1]})">Hello</div>
-    <div class="colour choice" style="background-color: var(${scoreColours[2]})">Hello</div>
-    <div class="colour choice" style="background-color: var(${scoreColours[3]})">Hello</div>
+    <div class="colour choice" style="background-color: var(${
+      scoreColours[0]
+    })">Hello</div>
+    <div class="colour choice" style="background-color: var(${
+      scoreColours[1]
+    })">Hello</div>
+    <div class="colour choice" style="background-color: var(${
+      scoreColours[2]
+    })">Hello</div>
+    <div class="colour choice" style="background-color: var(${
+      scoreColours[3]
+    })">Hello</div>
     </div>
     <div class="scoreTick">
     <div class="tick" style="${scoreTicker(scoreTick[0])}">${scoreTick[0]}</div>
@@ -181,9 +246,8 @@ function scoreBoard(codebreaker) {
     <div class="tick" style="${scoreTicker(scoreTick[3])}">${scoreTick[3]}</div>
     <div
     </div>
-    `
+    `;
 }
-
 
 // generate next board
 
