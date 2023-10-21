@@ -76,10 +76,11 @@ function handleSubmit() {
   for (i = 0; i < sel_Array.length; i++) {
     sel_Colours.push(sel_Array[i].value);
   }
+  console.log(sel_Colours)
   let scorelist = codeScorer(sel_Colours);
   codebreaker.push([sel_Colours, scorelist]);
   console.log(scorelist);
-  scoreBoard(codebreaker);
+  // scoreBoard(codebreaker);
 }
 
 // Codemaker scores board:
@@ -88,121 +89,77 @@ function handleSubmit() {
 
 function codeScorer(code_colours) {
   let score = [];
-  let match = [];
-  code_colours.forEach((colour, i) => {
-    console.log(colour, i, "Scorer")
-    let scoreMatch = codeMatcher(colour, code_colours, i);
-    console.log(scoreMatch)
-    match.push({colour, scoreMatch})
-    return;
-  });
-  console.log(match)
+  for (i = 0; i < code_colours.length; i++) {
+    let colour = code_colours[i]
+    let scoreCheck = codeChecker(colour, i);
+    console.log(scoreCheck)
+    score.push(scoreCheck);
+    console.log(score)
+  };
+  // console.log(match);
+  console.log(score);
 }
+
 function codeMatcher(colour, code_colours, i) {
-  console.log(colour, code_colours, i);
   var matched = [];
   // if position > 0, then compare to previous positions
   // if matches a previous position, skip first result; otherwise calculate correctly
-  if(i === 0) { console.log("We skip this one"); return }
-  for (let k = 0; k < i; k++) {
+  for (let k = -1; k < i; k++) {
+    // if (i === 0) {
+    //   matched.push(0)
+    //   return
+    // }
     if (colour === code_colours[k]) {
       // console.log("Yes!", code_colours[k], colour, k, "pushing " + k
       // )
-      matched.push(k)
+      matched.push(k+1);
     }
     if (colour != code_colours[k]) {
-      console.log("No~!", code_colours[k], colour, k)
-      continue
+      matched.push(0)
+      // console.log("No~!", code_colours[k], colour, k)
+      continue;
     }
   }
-  console.log(colour, matched)
-  return matched
-  }
+  return matched;
+}
 
+function codeChecker(colour, i) {
+  console.log(i, colour);
 
-function codeChecker(matched, colour, i) {
-  console.log(matched, i);
-  console.log(colour);
-  const score = "";
-  for (j = 0; j > codemaker.length; j++) {
-    if (colour === codemaker[j] && i === j) {
-      score = 2;
-      console.log(
-        colour +
-          " and " +
-          code +
-          "match in place" +
-          "Guess position " +
-          i +
-          ", maker position " +
-          j
-      );
-      console.log("Pushing 2 for " + colour, code);
-    } else if (colour === code && i != j) {
-      score = 1;
-      console.log(
-        colour +
-          " is in position " +
-          i +
-          ", but " +
-          code +
-          "is in position " +
-          j
-      );
-      console.log("Pushing 1 for " + colour, code);
-    } else {
-      score = 0;
-    }
-  }
-
-  // codemaker.every((code, j) => {
-  // if (colour === code && i != j) {
-  //   score.push(1)
-  //   console.log(
-  //     colour +
-  //       " is in position " +
-  //       i +
-  //       ", but " +
-  //       code +
-  //       "is in position " +
-  //       j
-  //   );
-  //   } else {
-  //     score.push(0);
-  //     console.log("this does not match")
-
-  // codemaker.every((code, j) => {
-  //   console.log(code)
-  //   if (colour === code && i === j) {
-  //     score.push(2)
-  //     console.log(colour +
-  //       " and " +
-  //       code +
-  //       "match in place" +
-  //       "Guess position " +
-  //       i +
-  //       ", maker position " +
-  //       j)
-
-  //   } else if (colour === code && i != j) {
-  //     score.push(1)
-  //     console.log(
-  //       colour +
-  //         " is in position " +
-  //         i +
-  //         ", but " +
-  //         code +
-  //         "is in position " +
-  //         j
-  //     );
-  //   } else {
-  //     score.push(0);
-  //     console.log("this does not match")
-  //   }
+  var pin_score;
+  codemaker.forEach((code, j) => {
+    console.log(colour, code, i, j)
+      if (colour === code && i === j) {
+        pin_score = 2;
+        console.log(
+          colour + " matched with " +
+            code +
+            " in guess position " +
+            i
+        );
+        
+        // console.log("Pushing 2 for " + colour, code);
+      } else if (colour === code && i != j) {
+        pin_score = 1;
+        console.log(
+          colour +
+            " is in position " +
+            i +
+            ", but " +
+            code +
+            "is in position " +
+            j
+        );
+        // console.log("Pushing 1 for " + colour, code, " in position " + j);
+      } else {
+        pin_score = 0;
+      }
+    })
+    
+    // );
   // });
-
-  console.log(score);
-  return score;
+  console.log(pin_score);
+  return pin_score;
 }
 
 function scoreBoard(codebreaker) {
