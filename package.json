@@ -1,0 +1,20 @@
+{
+  "name": "mastermind",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omgthegreenranger/mastermind.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/omgthegreenranger/mastermind/issues"
+  },
+  "homepage": "https://github.com/omgthegreenranger/mastermind#readme"
+}

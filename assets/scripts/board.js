@@ -44,8 +44,8 @@ let submitRow = [choice1, choice2, choice3, choice4];
 
 // set Codemaker code from 6 colours:
 
-function codeMaker() {
-  for (i = 0; i < 4; i++) {
+export function codeMaker() {
+  for (let i = 0; i < 4; i++) {
     let codeChoice = "--colour" + (Math.floor(Math.random() * 6) + 1);
     getComputedStyle(document.documentElement).getPropertyValue(codeChoice);
     codemaker.push(codeChoice);
@@ -58,7 +58,7 @@ function handlePick() {
   boardBox.style.setProperty("background-color", `var(${event.target.value})`);
 }
 
-function codeBreaker() {
+export function codeBreaker() {
   let roundChoice = [];
   let choiceBoxes = document.getElementById("choiceBox");
   // console.log(choiceBoxes);
@@ -73,7 +73,7 @@ function handleSubmit() {
   // console.log(event.target.previousSibling);
   let sel_Array = document.getElementsByName("colour-select");
   let sel_Colours = [];
-  for (i = 0; i < sel_Array.length; i++) {
+  for (let i = 0; i < sel_Array.length; i++) {
     sel_Colours.push(sel_Array[i].value);
   }
   console.log(sel_Colours)
@@ -89,7 +89,7 @@ function handleSubmit() {
 
 function codeScorer(code_colours) {
   let score = [];
-  for (i = 0; i < code_colours.length; i++) {
+  for (let i = 0; i < code_colours.length; i++) {
     let colour = code_colours[i]
     let scoreCheck = codeChecker(colour, i);
     console.log(scoreCheck)
@@ -210,11 +210,13 @@ function scoreBoard(codebreaker) {
 
 // repeat 12 times.
 
-function init() {
-  codeMaker();
-  codeBreaker();
-}
+// function init() {
+//   codeMaker();
+//   codeBreaker();
+// }
 
-init();
+// init();
 
 console.log(codemaker);
+
+// export { codeMaker, codeBreaker };
