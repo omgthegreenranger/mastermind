@@ -68,7 +68,7 @@ export function codeBreaker() {
     .addEventListener("click", () => handleSubmit());
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   // console.log("Hello!");
   // console.log(event.target.previousSibling);
   let sel_Array = document.getElementsByName("colour-select");
@@ -77,23 +77,29 @@ function handleSubmit() {
     sel_Colours.push(sel_Array[i].value);
   }
   console.log(sel_Colours)
-  let scorelist = codeScorer(sel_Colours);
+  let scorelist = await codeScorer(sel_Colours)
+  // let scorelist = await codeMatcher(sel_Colours)
+
   codebreaker.push([sel_Colours, scorelist]);
-  console.log(scorelist);
+  // console.log(scorelist);
   // scoreBoard(codebreaker);
+  
 }
 
 // Codemaker scores board:
 // - for each correct colour in correct place - white dot.
 // - for each correct colour in incorrect place - red dot.
 
-function codeScorer(code_colours) {
+async function codeScorer(code_colours) {
+  console.log(code_colours)
   let score = [];
   for (let i = 0; i < code_colours.length; i++) {
     let colour = code_colours[i]
-    let scoreCheck = codeChecker(colour, i);
+    let matchedScore = await codeMatcher(colour, code_colours, i)
+    let scoreCheck = await codeChecker(colour, i);
     console.log(scoreCheck)
     score.push(scoreCheck);
+    console.log(matchedScore)
     console.log(score)
   };
   // console.log(match);
@@ -125,7 +131,6 @@ function codeMatcher(colour, code_colours, i) {
 
 function codeChecker(colour, i) {
   console.log(i, colour);
-
   var pin_score;
   codemaker.forEach((code, j) => {
     console.log(colour, code, i, j)
