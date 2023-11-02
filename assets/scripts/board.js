@@ -110,18 +110,48 @@ async function codeScorer() {
   // const code_colours = sel_Colours
   console.log("Scoring colours", code_colours)
   let score = [];
-  for (let i = 0; i < code_colours.length; i++) {
-    let colour = code_colours[i]
-    console.log("***************Begin " + i + " (" + colour + ") ****************")
-    let matchedScore = await codeMatcher(colour, i)
-    let scoreCheck = await codeChecker(colour, i);
-    console.log("Double check", matchedScore)
-    console.log("Choice Score", scoreCheck)
-    score.push(scoreCheck);
-  };
-  // console.log(match);
-  console.log("Score", score);
+  let scoreCheck = codeValidate();
+  score.push(scoreCheck)
+  // console.log("Score", score);
 }
+
+
+
+function codeValidate() {
+  console.log("***Begin code validation***")
+  let colours = code_colours
+  let validatedScore = [];
+  console.log("Solution: ", codemaker)
+  console.log("Guess: ", colours)
+  // run loop for each pin in the solution
+  for (let i = 0; i < codemaker.length; i++) {
+    let code = codemaker[i];
+    console.log("*** Pass", i, "Colour: ", codemaker[i])
+    for (let j = 0; j < colours.length; j++) {
+      let colour = colours[j]
+      console.log("++ Colour pass ", j, colour)
+      if(code === colour && i === j) {
+        console.log("^^ Match position: Code - " + code + " Colour - " + colour )
+        colours[j] = "";
+        validatedScore[i] = 2;
+        break;
+      } else if (code === colour && i != j) {
+        console.log("-- Match colour: Code - " + code + " Colour - " + colour )
+        colours[j] = "";
+        validatedScore[i] = 1;
+        break;
+      } else {
+        console.log (">> No match:  Code - " + code + " Colour - " + colour )
+        validatedScore[i] = 0;
+        continue;
+      }      
+    }
+  }
+  console.log("SCORES: ", validatedScore)
+  console.log(colours)
+  console.log("*** Final score", colours)
+}
+
 
 function codeMatcher(colour, i) {
   code_colours.forEach((code, j) => {
