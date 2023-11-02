@@ -106,118 +106,67 @@ async function handleSubmit() {
 // - for each correct colour in correct place - white dot.
 // - for each correct colour in incorrect place - red dot.
 
-async function codeScorer() {
+function codeScorer() {
   // const code_colours = sel_Colours
-  console.log("Scoring colours", code_colours)
-  let score = [];
-  let scoreCheck = codeValidate();
-  score.push(scoreCheck)
-  // console.log("Score", score);
+  // console.log("Scoring colours", code_colours)
+  let scoreArray = code_colours
+  let secretArray = codemaker;
+  let score = []
+  let scorecard = new Promise(() => codeExact(scoreArray, secretArray, score))
+  .then(codeMissing(scoreArray, secretArray, score))
+  console.log("Score", score);
+  // scoreBoard(score);
 }
 
-
-
-function codeValidate() {
-  console.log("***Begin code validation***")
-  let colours = code_colours
-  let validatedScore = [];
-  console.log("Solution: ", codemaker)
-  console.log("Guess: ", colours)
+function codeExact(colours, secret, validatedScore) {
+  // console.log("***Begin exact validation***")
+  // console.log("Solution: ", secret)
+  // console.log("Guess: ", colours)
   // run loop for each pin in the solution
-  for (let i = 0; i < codemaker.length; i++) {
-    let code = codemaker[i];
-    console.log("*** Pass", i, "Colour: ", codemaker[i])
-    for (let j = 0; j < colours.length; j++) {
-      let colour = colours[j]
-      console.log("++ Colour pass ", j, colour)
-      if(code === colour && i === j) {
-        console.log("^^ Match position: Code - " + code + " Colour - " + colour )
-        colours[j] = "";
-        validatedScore[i] = 2;
-        break;
-      } else if (code === colour && i != j) {
-        console.log("-- Match colour: Code - " + code + " Colour - " + colour )
-        colours[j] = "";
-        validatedScore[i] = 1;
-        break;
-      } else {
-        console.log (">> No match:  Code - " + code + " Colour - " + colour )
-        validatedScore[i] = 0;
-        continue;
-      }      
+  for (let i = 0; i < secret.length; i++) {
+    let code = secret[i];
+    let colour = code_colours[i];
+    if (code === colour) {
+      // console.log("^^ Matches")
+      secret[i] = "";
+      code_colours[i] = "";
+      validatedScore.push(2);
+    } else {
+      console.log("XX Doesn't match")
     }
   }
-  console.log("SCORES: ", validatedScore)
-  console.log(colours)
-  console.log("*** Final score", colours)
+  // console.log("SCORES: ", validatedScore)
+  // console.log(colours)
+  // console.log("*** Final score", colours)
+  return
 }
 
-
-function codeMatcher(colour, i) {
-  code_colours.forEach((code, j) => {
-    console.log(i, j)
-    if( i === j) { console.log("Ignore this one")
-   }
-    else if (code === colour) {
-      console.log("colours match!")
-    } else {console.log("Colours do not match!")}
-  })
-  var matched;
-  for (let k = 0; k < i; k++) {
-    console.log("^^^^^^ Check position " + k + ": " + code_colours[k])
-    if (colour === code_colours[k]) {
-      console.log("Colour matches position " + k + ", pushing " + (k+1)
-      )
-      console.log("Colour: " + colour, "Position: " + code_colours[k])
-      matched = 1;
-    }
-    else if (colour != code_colours[k]) {
-      matched = 0;
-      continue;
-      console.log("Colour does not match position " + k + ", pushing 0")
-      console.log("Colour: " + colour, "Position: " + code_colours[k])
+function codeMissing(colours, secret, validatedScore) {
+  // console.log("***Begin inexact validation***")
+  // console.log("Solution: ", secret)
+  // console.log("Guess: ", colours)
+  // run loop for each pin in the solution
+  for (let i = 0; i < secret.length; i++) {
+    let code = secret[i];
+    for(let j = 0; j < colours.length; j++) {
+    let colour = code_colours[j];
+    if (code != '' && colour != '' && code === colour) {
+      // console.log("^^ Matches")
+      secret[i] = "";
+      code_colours[j] = "";
+      validatedScore.push(1);
+      break;
+    } else {
+      console.log("XX Doesn't match")
     }
   }
-  return matched;
+}
+  // console.log("SCORES: ", validatedScore)
+  // console.log(colours)
+  // console.log("*** Final score", colours)
+  return
 }
 
-function codeChecker(colour, i) {
-
-// if score 2 && match false = pin_score 2
-// if score 2 && match true = 
-
-  console.log("Solution: " + codemaker)
-  var pin_score;
-  for (let j = 0; j < codemaker.length; j++) {
-    console.log("^^^^^^ Check score " + j + ": " + codemaker[j] + ", " + colour)
-    // console.log(matches[j])
-      if (colour === codemaker[j] && i === j) {
-        // let matchedScore = codeMatcher(colour, i)
-        // console.log("MatchedScore: " + matchedScore)
-        console.log(">> Score: " + "2")
-        pin_score = 2;
-        break;
-      } else if (colour === codemaker[j] && i != j) {
-        // let matchedScore = codeMatcher(colour, i)
-        // console.log("MatchedScore: " + matchedScore)
-        console.log(">> Score: " + "1")
-        // if(matchedScore === 1) {
-        pin_score = 1;
-        // } else {
-          // pin_score = 0;
-        // }
-        // break;
-      } else {
-        console.log(">> Score: " + "0")
-        pin_score = 0;
-      }
-    }
-    
-    // );
-  // });
-  console.log("Pin Score:" + pin_score);
-  return pin_score;
-}
 
 function scoreBoard(codebreaker) {
   let rounds = document.getElementById("rounds");
