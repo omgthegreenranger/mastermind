@@ -2,7 +2,7 @@
 
 const codemaker = [];
 const codebreaker = [];
-const code_colours = [];
+var code_colours = [];
 
 // set 6 colours
 let colour1 = getComputedStyle(document.documentElement).getPropertyValue(
@@ -45,6 +45,25 @@ let submitRow = [choice1, choice2, choice3, choice4];
 
 // set Codemaker code from 6 colours:
 
+export function devSolve() {
+  let solve = document.getElementById("dev-solve");
+  solve.innerHTML += `<div class="colour-options">
+    <div class="colour choice" style="background-color: var(${
+      codemaker[0]
+    })">Hello</div>
+    <div class="colour choice" style="background-color: var(${
+      codemaker[1]
+    })">Hello</div>
+    <div class="colour choice" style="background-color: var(${
+      codemaker[2]
+    })">Hello</div>
+    <div class="colour choice" style="background-color: var(${
+      codemaker[3]
+    })">Hello</div>
+    </div>
+    `;
+}
+
 export function codeMaker() {
   for (let i = 0; i < 4; i++) {
     let codeChoice = "--colour" + (Math.floor(Math.random() * 6) + 1);
@@ -70,16 +89,17 @@ export function codeBreaker() {
 }
 
 async function handleSubmit() {
-  let sel_Array = document.getElementsByName("colour-select");
+  code_colours = [];
+  let sel_Array = [];
+  sel_Array = document.getElementsByName("colour-select");
   // let sel_Colours = [];
   for (let i = 0; i < sel_Array.length; i++) {
     code_colours.push(sel_Array[i].value);
   }
-  // console.log("Chosen colours", sel_Colours)
   let scorelist = await codeScorer()
-  // let scorelist = await codeMatcher(sel_Colours)
   codebreaker.push([code_colours, scorelist]);
-  
+  let boardBox = event.target.previousSibling.previousSibling;
+  boardBox.style.setProperty("background-color", `var(${event.target.value})`);
 }
 
 // Codemaker scores board:
@@ -93,9 +113,9 @@ async function codeScorer() {
   for (let i = 0; i < code_colours.length; i++) {
     let colour = code_colours[i]
     console.log("***************Begin " + i + " (" + colour + ") ****************")
-    // let matchedScore = await codeMatcher(colour, code_colours, i)
+    let matchedScore = await codeMatcher(colour, i)
     let scoreCheck = await codeChecker(colour, i);
-    // console.log("Double check", matchedScore)
+    console.log("Double check", matchedScore)
     console.log("Choice Score", scoreCheck)
     score.push(scoreCheck);
   };
@@ -104,6 +124,14 @@ async function codeScorer() {
 }
 
 function codeMatcher(colour, i) {
+  code_colours.forEach((code, j) => {
+    console.log(i, j)
+    if( i === j) { console.log("Ignore this one")
+   }
+    else if (code === colour) {
+      console.log("colours match!")
+    } else {console.log("Colours do not match!")}
+  })
   var matched;
   for (let k = 0; k < i; k++) {
     console.log("^^^^^^ Check position " + k + ": " + code_colours[k])
@@ -124,28 +152,31 @@ function codeMatcher(colour, i) {
 }
 
 function codeChecker(colour, i) {
-  // console.log("Matches: " + matches)
+
+// if score 2 && match false = pin_score 2
+// if score 2 && match true = 
+
   console.log("Solution: " + codemaker)
   var pin_score;
   for (let j = 0; j < codemaker.length; j++) {
     console.log("^^^^^^ Check score " + j + ": " + codemaker[j] + ", " + colour)
     // console.log(matches[j])
       if (colour === codemaker[j] && i === j) {
-        let matchedScore = codeMatcher(colour, i)
-        console.log("MatchedScore: " + matchedScore)
+        // let matchedScore = codeMatcher(colour, i)
+        // console.log("MatchedScore: " + matchedScore)
         console.log(">> Score: " + "2")
         pin_score = 2;
         break;
       } else if (colour === codemaker[j] && i != j) {
-        let matchedScore = codeMatcher(colour, i)
-        console.log("MatchedScore: " + matchedScore)
+        // let matchedScore = codeMatcher(colour, i)
+        // console.log("MatchedScore: " + matchedScore)
         console.log(">> Score: " + "1")
-        if(matchedScore === 1) {
+        // if(matchedScore === 1) {
         pin_score = 1;
-        } else {
-          pin_score = 0;
-        }
-        break;
+        // } else {
+          // pin_score = 0;
+        // }
+        // break;
       } else {
         console.log(">> Score: " + "0")
         pin_score = 0;
