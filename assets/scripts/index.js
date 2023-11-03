@@ -1,10 +1,10 @@
 import { codeMaker, codeBreaker, devSolve, boardCreate } from './board.js';
-// import {devSolve} from './dev.js';
+
 
 function init() {
   boardCreate();
     codeMaker();
-    // devSolve();
+    // devSolve(); this is the dev to display solution on the board - keep off in prod
     codeBreaker();
   }
   

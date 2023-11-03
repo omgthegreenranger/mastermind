@@ -96,7 +96,7 @@ function handleSubmit() {
   codebreaker.push(roundScore)
   console.log(codebreaker);
   scoreBoard(codebreaker);
-  boardCreate();
+  boardReset();
 }
 
 function codeExact(scoreArray, secretArray) {
@@ -150,7 +150,13 @@ function codeMissing(scoreArray, secretArray, validatedScore) {
 }
 
 function scoreBoard(codebreaker) {
+  // get HTML elements for display
   let rounds = document.getElementById("rounds");
+  let roundCount = document.getElementById("round-counter");
+  let scoreBox = document.getElementById("score-box");
+  // display round
+  roundCount.innerHTML =`${codebreaker.length + 1} of 12`;
+  // scoreboard history
   rounds.innerHTML = "";
   codebreaker.forEach((round, i) => {
   let scoreRound = i+1;
@@ -183,20 +189,25 @@ function scoreBoard(codebreaker) {
       scoreColours[3]
     })">Hello</div>
     </div>
-    <div class="scoreTick">
+    `;
+    scoreBox.innerHTML += `<div class="scoreTick">
     <div class="tick" style="${scoreTicker(scoreTick[0])}">${scoreTick[0]}</div>
     <div class="tick" style="${scoreTicker(scoreTick[1])}">${scoreTick[1]}</div>
     <div class="tick" style="${scoreTicker(scoreTick[2])}">${scoreTick[2]}</div>
     <div class="tick" style="${scoreTicker(scoreTick[3])}">${scoreTick[3]}</div>
-    <div
-    </div>
-    `;
+    <div`
 })}
 
 export function boardCreate() {
-  let board = document.getElementById("choiceBox");
+  // get elements for creation
+  let roundCount = document.getElementById("round-counter");
+  roundCount.innerHTML = `Round 1 of 12`;
+  boardReset();
+}
 
-  
+
+function boardReset() {
+  let board = document.getElementById("choiceBox");
   board.innerHTML = `
   <div class="option-box">
   <div class="colour choice" id="choice1">&nbsp;</div>
@@ -246,10 +257,6 @@ export function boardCreate() {
                 <option value="--colour6" id="colour6">Violet</option>
               </select>
             </div>`
-}
-
-
-function boardReset() {
 
 }
 
