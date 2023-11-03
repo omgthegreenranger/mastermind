@@ -48,18 +48,10 @@ let submitRow = [choice1, choice2, choice3, choice4];
 export function devSolve() {
   let solve = document.getElementById("dev-solve");
   solve.innerHTML += `<div class="colour-options">
-    <div class="colour choice" style="background-color: var(${
-      codemaker[0]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(${
-      codemaker[1]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(${
-      codemaker[2]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(${
-      codemaker[3]
-    })">Hello</div>
+    <div class="colour choice" style="background-color: var(${codemaker[0]})">Hello</div>
+    <div class="colour choice" style="background-color: var(${codemaker[1]})">Hello</div>
+    <div class="colour choice" style="background-color: var(${codemaker[2]})">Hello</div>
+    <div class="colour choice" style="background-color: var(${codemaker[3]})">Hello</div>
     </div>
     `;
 }
@@ -88,96 +80,85 @@ export function codeBreaker() {
     .addEventListener("click", () => handleSubmit());
 }
 
-async function handleSubmit() {
+function handleSubmit() {
   code_colours = [];
+  let scoreArray = [];
   let sel_Array = [];
   sel_Array = document.getElementsByName("colour-select");
-  // let sel_Colours = [];
   for (let i = 0; i < sel_Array.length; i++) {
     code_colours.push(sel_Array[i].value);
+    scoreArray.push(sel_Array[i].value)
   }
-  let scorelist = await codeScorer()
-  codebreaker.push([code_colours, scorelist]);
-  let boardBox = event.target.previousSibling.previousSibling;
-  boardBox.style.setProperty("background-color", `var(${event.target.value})`);
-}
-
-// Codemaker scores board:
-// - for each correct colour in correct place - white dot.
-// - for each correct colour in incorrect place - red dot.
-
-function codeScorer() {
-  // const code_colours = sel_Colours
-  // console.log("Scoring colours", code_colours)
-  let scoreArray = code_colours
   let secretArray = codemaker;
-  let score = []
-  let scorecard = new Promise(() => codeExact(scoreArray, secretArray, score))
-  .then(codeMissing(scoreArray, secretArray, score))
-  console.log("Score", score);
-  // scoreBoard(score);
+  // let score = [];
+  let score = codeExact(scoreArray, secretArray)
+  let roundScore = [code_colours, score];
+  codebreaker.push(roundScore)
+  console.log(codebreaker);
+  scoreBoard(codebreaker);
+  boardCreate();
 }
 
-function codeExact(colours, secret, validatedScore) {
-  // console.log("***Begin exact validation***")
-  // console.log("Solution: ", secret)
-  // console.log("Guess: ", colours)
-  // run loop for each pin in the solution
-  for (let i = 0; i < secret.length; i++) {
-    let code = secret[i];
-    let colour = code_colours[i];
+function codeExact(scoreArray, secretArray) {
+  let validatedScore = []
+  console.log("*** Begin exact validation ***")
+  console.log("EXACT DATA SET: ", scoreArray, secretArray, validatedScore)
+  for (let i = 0; i < secretArray.length; i++) {
+    let code = secretArray[i];
+    let colour = scoreArray[i];
     if (code === colour) {
       // console.log("^^ Matches")
-      secret[i] = "";
-      code_colours[i] = "";
+      secretArray[i] = "";
+      scoreArray[i] = "";
       validatedScore.push(2);
     } else {
-      console.log("XX Doesn't match")
+      console.log("XX Doesn't match");
     }
   }
-  // console.log("SCORES: ", validatedScore)
-  // console.log(colours)
-  // console.log("*** Final score", colours)
-  return
+  codeMissing(scoreArray, secretArray, validatedScore)
+  console.log("SCORES: ", validatedScore)
+  console.log("Exact Solution: ", secretArray)
+  console.log("Remaining guesses: ",scoreArray)
+  return validatedScore;
 }
 
-function codeMissing(colours, secret, validatedScore) {
-  // console.log("***Begin inexact validation***")
+function codeMissing(scoreArray, secretArray, validatedScore) {
+  console.log("***Begin inexact validation***")
+  console.log("INEXACT DATA SET: ", scoreArray, secretArray, validatedScore)
   // console.log("Solution: ", secret)
   // console.log("Guess: ", colours)
   // run loop for each pin in the solution
-  for (let i = 0; i < secret.length; i++) {
-    let code = secret[i];
-    for(let j = 0; j < colours.length; j++) {
-    let colour = code_colours[j];
-    if (code != '' && colour != '' && code === colour) {
-      // console.log("^^ Matches")
-      secret[i] = "";
-      code_colours[j] = "";
-      validatedScore.push(1);
-      break;
-    } else {
-      console.log("XX Doesn't match")
+  for (let i = 0; i < secretArray.length; i++) {
+    let code = secretArray[i];
+    for (let j = 0; j < scoreArray.length; j++) {
+      let colour = scoreArray[j];
+      if (code != "" && colour != "" && code === colour) {
+        // console.log("^^ Matches")
+        secretArray[i] = "";
+        scoreArray[j] = "";
+        validatedScore.push(1);
+        break;
+      } else {
+        console.log("XX Doesn't match");
+      }
     }
   }
+  console.log("Remaining Score: ", validatedScore)
+  console.log("Remaining Solution: ", secretArray)
+  console.log("Remaining guesses: ", scoreArray)
+  return validatedScore;
 }
-  // console.log("SCORES: ", validatedScore)
-  // console.log(colours)
-  // console.log("*** Final score", colours)
-  return
-}
-
 
 function scoreBoard(codebreaker) {
   let rounds = document.getElementById("rounds");
-  let scoreRound = codebreaker.length;
-  let scoredraft = codebreaker[scoreRound - 1];
-  let scoreColours = scoredraft[0];
-  let scoreTick = scoredraft[1];
-  // console.log(codebreaker);
-  // console.log(scoredraft);
-  // console.log(scoreColours);
-  // console.log(scoreTick);
+  rounds.innerHTML = "";
+  codebreaker.forEach((round, i) => {
+  let scoreRound = i+1;
+  let scoreColours = round[0];
+  let scoreTick = round[1];
+  console.log(codebreaker);
+  console.log(scoreColours);
+  console.log(scoreTick);
   function scoreTicker(tick) {
     if (tick === 2) {
       return "background-color: white";
@@ -210,6 +191,66 @@ function scoreBoard(codebreaker) {
     <div
     </div>
     `;
+})}
+
+export function boardCreate() {
+  let board = document.getElementById("choiceBox");
+
+  
+  board.innerHTML = `
+  <div class="option-box">
+  <div class="colour choice" id="choice1">&nbsp;</div>
+  <select name="colour-select" id="selector1">
+    <option value="" defaultSelected>Pick Colour</option>
+    <option value="--colour1" id="colour1">Red</option>
+    <option value="--colour2" id="colour2">Orange</option>
+    <option value="--colour3" id="colour3">Yellow</option>
+    <option value="--colour4" id="colour4">Green</option>
+    <option value="--colour5" id="colour5">Blue</option>
+    <option value="--colour6" id="colour6">Violet</option>
+  </select>
+</div>
+<div class="option-box">
+              <div class="colour choice" id="choice2">&nbsp;</div>
+              <select name="colour-select" id="selector2">
+                <option value="" deaultSelected>Pick Colour</option>
+                <option value="--colour1" id="colour1">Red</option>
+                <option value="--colour2" id="colour2">Orange</option>
+                <option value="--colour3" id="colour3">Yellow</option>
+                <option value="--colour4" id="colour4">Green</option>
+                <option value="--colour5" id="colour5">Blue</option>
+                <option value="--colour6" id="colour6">Violet</option>
+              </select>
+            </div>
+            <div class="option-box">
+              <div class="colour choice" id="choice3">&nbsp;</div>
+              <select name="colour-select" id="selector3">
+                <option value="" defaultSelected>Pick Colour</option>
+                <option value="--colour1" id="colour1">Red</option>
+                <option value="--colour2" id="colour2">Orange</option>
+                <option value="--colour3" id="colour3">Yellow</option>
+                <option value="--colour4" id="colour4">Green</option>
+                <option value="--colour5" id="colour5">Blue</option>
+                <option value="--colour6" id="colour6">Violet</option>
+              </select>
+            </div>
+            <div class="option-box">
+              <div class="colour choice" id="choice4">&nbsp;</div>
+              <select name="colour-select" id="selector4">
+                <option value="" defaultSelected>Pick Colour</option>
+                <option value="--colour1" id="colour1">Red</option>
+                <option value="--colour2" id="colour2">Orange</option>
+                <option value="--colour3" id="colour3">Yellow</option>
+                <option value="--colour4" id="colour4">Green</option>
+                <option value="--colour5" id="colour5">Blue</option>
+                <option value="--colour6" id="colour6">Violet</option>
+              </select>
+            </div>`
+}
+
+
+function boardReset() {
+
 }
 
 // generate next board
