@@ -1,10 +1,10 @@
 :root {
-    --colour1: red;
-    --colour2: orange;
-    --colour3: yellow;
-    --colour4: green;
-    --colour5: blue;
-    --colour6: violet;
+    --colour0: red;
+    --colour1: orange;
+    --colour2: yellow;
+    --colour3: green;
+    --colour4: blue;
+    --colour5: violet;
 }
 
 .options {
@@ -12,6 +12,22 @@
 }
 .colour-options {
     display: flex;
+    list-style-type: none;
+}
+.rounds-round {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
+
+.rounds-board {
+    display: flex;
+    flex-direction:row;
+
+}
+.rounds-score {
+    display: flex;
+    flex-direction: column;
     list-style-type: none;
 }
 
@@ -26,6 +42,12 @@
     background-color: grey;
 
 }
+
+.scoreTick {
+    display: flex;
+    flex: row 2 2;
+}
+
 
 /* #selector-modal {
     display: none;
