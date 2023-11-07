@@ -96,7 +96,7 @@ function handleSubmit() {
   codebreaker.push(roundScore)
   console.log(codebreaker);
   scoreBoard(codebreaker);
-  boardReset();
+  boardReset(codebreaker);
 }
 
 function codeExact(scoreArray, secretArray) {
@@ -154,8 +154,10 @@ function scoreBoard(codebreaker) {
   let rounds = document.getElementById("rounds");
   let roundCount = document.getElementById("round-counter");
   let scoreBox = document.getElementById("score-box");
-  // display round
   roundCount.innerHTML =`${codebreaker.length + 1} of 12`;
+  if(codebreaker.length < 12){
+  // display round
+
   // scoreboard history
   rounds.innerHTML = "";
   codebreaker.forEach((round, i) => {
@@ -165,6 +167,7 @@ function scoreBoard(codebreaker) {
   console.log(codebreaker);
   console.log(scoreColours);
   console.log(scoreTick);
+
   function scoreTicker(tick) {
     if (tick === 2) {
       return "background-color: white";
@@ -175,7 +178,6 @@ function scoreBoard(codebreaker) {
     }
   }
   rounds.innerHTML += `<div class="colour-options">
-    <div>Round ${scoreRound}</div>
     <div class="colour choice" style="background-color: var(${
       scoreColours[0]
     })">Hello</div>
@@ -196,8 +198,10 @@ function scoreBoard(codebreaker) {
     <div class="tick" style="${scoreTicker(scoreTick[2])}">${scoreTick[2]}</div>
     <div class="tick" style="${scoreTicker(scoreTick[3])}">${scoreTick[3]}</div>
     <div`
-})}
-
+})} else {
+  rounds.innerHTML = "GAME OVER"
+}
+}
 export function boardCreate() {
   // get elements for creation
   let roundCount = document.getElementById("round-counter");
@@ -206,8 +210,12 @@ export function boardCreate() {
 }
 
 
-function boardReset() {
+function boardReset(codebreaker) {
   let board = document.getElementById("choiceBox");
+  if(codebreaker && codebreaker.length === 12){
+    board.innerHTML =`
+    <div class="option-box" style="display:none"></div>`
+  } else {
   board.innerHTML = `
   <div class="option-box">
   <div class="colour choice" id="choice1">&nbsp;</div>
@@ -257,7 +265,7 @@ function boardReset() {
                 <option value="--colour6" id="colour6">Violet</option>
               </select>
             </div>`
-
+  }
 }
 
 // generate next board
