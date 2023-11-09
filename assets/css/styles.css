@@ -30,7 +30,9 @@
     flex-direction: column;
     list-style-type: none;
 }
-
+.not-picked {
+    border: 2px red solid!important;
+}
 .colour {
     padding: 10px;
     width:100%;

@@ -1,6 +1,7 @@
 import { codeMaker, codeBreaker } from "./board.js";
 
-// set 6 colours
+
+// const codebreaker = [];
 const base_colours = [];
 
 for (let i = 0; i < 6; i++) {
@@ -13,25 +14,24 @@ console.log("BASE COLOURS", base_colours);
 
 // code has 4 pegs
 
-let choice1 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice1"
-);
-let choice2 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice2"
-);
-let choice3 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice3"
-);
-let choice4 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice4"
-);
+// let choice1 = getComputedStyle(document.documentElement).getPropertyValue(
+//   "--choice1"
+// );
+// let choice2 = getComputedStyle(document.documentElement).getPropertyValue(
+//   "--choice2"
+// );
+// let choice3 = getComputedStyle(document.documentElement).getPropertyValue(
+//   "--choice3"
+// );
+// let choice4 = getComputedStyle(document.documentElement).getPropertyValue(
+//   "--choice4"
+// );
 
-let submitRow = [choice1, choice2, choice3, choice4];
+// let submitRow = [choice1, choice2, choice3, choice4];
 
 async function handleSubmit() {
   let codeGuess = [];
   let sel_Array = [];
-  let staticGuess = [];
   let pickID;
   sel_Array = document.getElementsByName("colour-select");
   for (let i = 0; i < sel_Array.length; i++) {
@@ -41,11 +41,11 @@ async function handleSubmit() {
       pickID = "choice" + (i + 1);
       console.log(pickID);
       let square = document.getElementById(pickID);
-      square.innerHTML = `<span>PICK PLEASE<span>`;
+      square.classList.add("not-picked");
+      // square.innerHTML = `<span>PICK PLEASE<span>`;
     } else {
       // or continue
       codeGuess.push(parseInt(sel_Array[i].value));
-      staticGuess.push(parseInt(sel_Array[i].value));
       continue;
     }
   }
@@ -53,10 +53,18 @@ async function handleSubmit() {
   if (pickID) {
     return;
   } else {
-    let response = await codeBreaker(codeGuess);
-    scoreBoard(response);
-    boardReset(response);
+    let response = await codeBreaker(codeGuess)
+    // codebreaker.push(response[0]);
+    // localStorage.setItem("CodeGame", JSON.stringify(response))
+    scoreBoard(false);
+    boardReset();
   }
+}
+
+function handleReset() {
+  localStorage.clear("CodeGame");
+  scoreBoard(true);
+  init();
 }
 
 function handlePick() {
@@ -73,7 +81,8 @@ function boardCreate() {
   boardReset();
 }
 
-function boardReset(codebreaker) {
+function boardReset() {
+  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"))
   let board = document.getElementById("choiceBox");
   let button = document.getElementById("buttonField");
   if (codebreaker && codebreaker.length === 12) {
@@ -139,15 +148,25 @@ function boardReset(codebreaker) {
   document
     .getElementById("submit")
     .addEventListener("click", () => handleSubmit());
+  document
+    .getElementById("reset")
+    .addEventListener("click", () => handleReset());
 }
 
-function scoreBoard(codebreaker) {
-  // console.log(codebreaker);
-  // get HTML elements for display
+function scoreBoard(reset) {
+    // get HTML elements for display
   let rounds = document.getElementById("rounds");
   let roundCount = document.getElementById("round-counter");
   let roundsBoard = document.getElementById("roundsBoard");
   let scoreBox = document.getElementById("score-box");
+  
+  if(reset === true) {
+    rounds.innerHTML ="";
+    roundCount.innerHTML = "Round 1 of 12";
+    roundsBoard.innerHTML = "";
+  } else if(reset === false) {
+  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"))
+
   roundCount.innerHTML = `${codebreaker.length + 1} of 12`;
   // console.log(codebreaker);
   if (codebreaker.length < 12) {
@@ -198,6 +217,7 @@ function scoreBoard(codebreaker) {
   } else {
     rounds.innerHTML = "GAME OVER";
   }
+}
 }
 
 function init() {

@@ -1,21 +1,21 @@
 // set arrays for game.
 
-const codemaker = [];
-const secretCode = [];
-const codebreaker = [];
-var code_colours = [];
+const codemaker = ['','','',''];
+// const codebreaker = [];
 const choiceCount = 6;
 
 export function codeMaker() {
   for (let i = 0; i < 4; i++) {
     let codeChoice = Math.floor(Math.random() * choiceCount);
-    codemaker.push(codeChoice);
+    codemaker[i] = codeChoice;
   }
   console.log("Solution", codemaker);
 }
 
 export function codeBreaker(guessArray) {
   console.log("CodeBreaker function ", codemaker);
+  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
+  console.log(codebreaker);
   let winState;
   let round = codebreaker.length + 1;
   // let guessArray = codeGuess;
