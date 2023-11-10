@@ -1,220 +1,121 @@
+// MASTERMIND backend score evaluation script
+
 // set arrays for game.
 
-const codemaker = [];
-const codebreaker = [];
+// set constants
+const codemaker = ["", "", "", ""];
+const choiceCount = 6; // this will be an adjustable option later
 
-// set 6 colours
-let colour1 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--colour1"
-);
-let colour2 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--colour2"
-);
-let colour3 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--colour3"
-);
-let colour4 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--colour4"
-);
-let colour5 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--colour5"
-);
-let colour6 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--colour6"
-);
-
-let base_colours = [colour1, colour2, colour3, colour4, colour5, colour6];
-
-// code has 4 pegs
-
-let choice1 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice1"
-);
-let choice2 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice2"
-);
-let choice3 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice3"
-);
-let choice4 = getComputedStyle(document.documentElement).getPropertyValue(
-  "--choice4"
-);
-
-let submitRow = [choice1, choice2, choice3, choice4];
-
-// set Codemaker code from 6 colours:
-
-function codeMaker() {
-  for (i = 0; i < 4; i++) {
-    let codeChoice = "--colour" + (Math.floor(Math.random() * 6) + 1);
-    getComputedStyle(document.documentElement).getPropertyValue(codeChoice);
-    codemaker.push(codeChoice);
+export function codeMaker() {
+  // get the codemaker's secret code
+  for (let i = 0; i < 4; i++) {
+    let codeChoice = Math.floor(Math.random() * choiceCount);
+    codemaker[i] = codeChoice;
   }
+  // console.log("Solution", codemaker);
 }
 
-function handlePick() {
-  // console.log(event.target.previousSibling.previousSibling.style);
-  let boardBox = event.target.previousSibling.previousSibling;
-  boardBox.style.setProperty("background-color", `var(${event.target.value})`);
-}
+export function codeBreaker(guessArray) {
+  // begin the game; allow the codebreaker to begin guessing
+  // console.log("CodeBreaker function ", codemaker);
 
-function codeBreaker() {
-  let roundChoice = [];
-  let choiceBoxes = document.getElementById("choiceBox");
-  // console.log(choiceBoxes);
-  choiceBoxes.addEventListener("input", handlePick);
-  document
-    .getElementById("submit")
-    .addEventListener("click", () => handleSubmit());
-}
+  // Set variables
+  let codebreaker = JSON.parse(localStorage.getItem("CodeGame")); // the ongoing guess history in local storage. Get that.
+  let winState; // did they win in this round?
+  let round; // get the round array from the guessing history.
 
-function handleSubmit() {
-  // console.log("Hello!");
-  // console.log(event.target.previousSibling);
-  let sel_Array = document.getElementsByName("colour-select");
-  let sel_Colours = [];
-  for (i = 0; i < sel_Array.length; i++) {
-    sel_Colours.push(sel_Array[i].value);
+  // if there is no history, set base round to 1.
+  if (!codebreaker) {
+    codebreaker = [];
+    round = 1;
+    console.log(codebreaker);
   }
-  console.log(sel_Colours)
-  let scorelist = codeScorer(sel_Colours);
-  codebreaker.push([sel_Colours, scorelist]);
-  console.log(scorelist);
-  // scoreBoard(codebreaker);
-}
+  // otherwise, the round is the length plus 1
+  else {
+    round = codebreaker.length + 1; // this might want to use the round option in the response, perhaps
+  }
+  
+  // the following two variables create temp arrays of the secret and guessed code, so we can mess with them
+  let secretArray = JSON.parse(JSON.stringify(codemaker)); 
+  let roundGuess = JSON.parse(JSON.stringify(guessArray)); 
 
-// Codemaker scores board:
-// - for each correct colour in correct place - white dot.
-// - for each correct colour in incorrect place - red dot.
-
-function codeScorer(code_colours) {
-  let score = [];
-  for (i = 0; i < code_colours.length; i++) {
-    let colour = code_colours[i]
-    let scoreCheck = codeChecker(colour, i);
-    console.log(scoreCheck)
-    score.push(scoreCheck);
-    console.log(score)
-  };
-  // console.log(match);
-  console.log(score);
-}
-
-function codeMatcher(colour, code_colours, i) {
-  var matched = [];
-  // if position > 0, then compare to previous positions
-  // if matches a previous position, skip first result; otherwise calculate correctly
-  for (let k = -1; k < i; k++) {
-    // if (i === 0) {
-    //   matched.push(0)
-    //   return
-    // }
-    if (colour === code_colours[k]) {
-      // console.log("Yes!", code_colours[k], colour, k, "pushing " + k
-      // )
-      matched.push(k+1);
-    }
-    if (colour != code_colours[k]) {
-      matched.push(0)
-      // console.log("No~!", code_colours[k], colour, k)
+  // run scoring functions to determine... score...
+  let score = codeExact(guessArray, secretArray);
+  
+  // set the winState field in the response - 2 for WIN, 1 for CONTINUE, 0 for LOST
+  for (let i = 0; i < 4; i++) {
+    if (score[i] === 2) {
+      winState = 2;
       continue;
+    } else if (score[i] != 2) {
+      winState = 1;
+      break;
+    } else if (round === 12) {
+      winState = 0;
+      break;
     }
   }
-  return matched;
+
+  // push to the history array and return to localStorage
+  codebreaker.push([roundGuess, score, winState, round]);
+  // console.log("Codebreaker", codebreaker);
+  localStorage.setItem("CodeGame", JSON.stringify(codebreaker));
+  return codebreaker;
 }
 
-function codeChecker(colour, i) {
-  console.log(i, colour);
+// the following two chained functions get the score.
+// we do this by elimination to avoid duplicates. This is because:
+// - a choice/code match is 1:1, regardless of whether it is exact or inexact
+// - both guess and code can have duplicate choices, they need to apply independently and without duplication
 
-  var pin_score;
-  codemaker.forEach((code, j) => {
-    console.log(colour, code, i, j)
-      if (colour === code && i === j) {
-        pin_score = 2;
-        console.log(
-          colour + " matched with " +
-            code +
-            " in guess position " +
-            i
-        );
-        
-        // console.log("Pushing 2 for " + colour, code);
-      } else if (colour === code && i != j) {
-        pin_score = 1;
-        console.log(
-          colour +
-            " is in position " +
-            i +
-            ", but " +
-            code +
-            "is in position " +
-            j
-        );
-        // console.log("Pushing 1 for " + colour, code, " in position " + j);
-      } else {
-        pin_score = 0;
-      }
-    })
-    
-    // );
-  // });
-  console.log(pin_score);
-  return pin_score;
-}
+function codeExact(guessArray, secretArray) { 
+  //We start by calculating all EXACT MATCHES (where guess is correct and in right position) and removing them from the arrays.
 
-function scoreBoard(codebreaker) {
-  let rounds = document.getElementById("rounds");
-  let scoreRound = codebreaker.length;
-  let scoredraft = codebreaker[scoreRound - 1];
-  let scoreColours = scoredraft[0];
-  let scoreTick = scoredraft[1];
-  // console.log(codebreaker);
-  // console.log(scoredraft);
-  // console.log(scoreColours);
-  // console.log(scoreTick);
-  function scoreTicker(tick) {
-    if (tick === 2) {
-      return "background-color: white";
-    } else if (tick === 1) {
-      return "background-color: red";
+  let validatedScore = []; // temp array for score result. Note that it is _not_ positional to the code, just a list of scores.
+
+  console.log("*** Begin exact validation ***");
+  
+  // console.log("EXACT DATA SET: ", guessArray, secretArray, validatedScore);
+  
+  // compare code to guess at i position.
+  for (let i = 0; i < secretArray.length; i++) {
+    let code = secretArray[i];
+    let guess = guessArray[i];
+    console.log(code, guess);
+    if (code === guess) {
+      // if the choice and position match, clear value from array and push "2" to score
+      secretArray[i] = "";
+      guessArray[i] = "";
+      validatedScore.push(2);
     } else {
-      return "display: none";
+      // console.log("XX Doesn't match");
     }
   }
-  rounds.innerHTML += `<div class="colour-options">
-    <div>Round ${scoreRound}</div>
-    <div class="colour choice" style="background-color: var(${
-      scoreColours[0]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(${
-      scoreColours[1]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(${
-      scoreColours[2]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(${
-      scoreColours[3]
-    })">Hello</div>
-    </div>
-    <div class="scoreTick">
-    <div class="tick" style="${scoreTicker(scoreTick[0])}">${scoreTick[0]}</div>
-    <div class="tick" style="${scoreTicker(scoreTick[1])}">${scoreTick[1]}</div>
-    <div class="tick" style="${scoreTicker(scoreTick[2])}">${scoreTick[2]}</div>
-    <div class="tick" style="${scoreTicker(scoreTick[3])}">${scoreTick[3]}</div>
-    <div
-    </div>
-    `;
+  codeMissing(guessArray, secretArray, validatedScore); // with remaining choices, move to inexact match function
+  return validatedScore;
 }
 
-// generate next board
+function codeMissing(guessArray, secretArray, validatedScore) {
+  // this takes the remaining arrays, and compares each code to each guess to find any inexact matches (correct choice, wrong position)
+  console.log("***Begin inexact validation***");
+  
+  // console.log("INEXACT DATA SET: ", guessArray, secretArray, validatedScore);
 
-// repeat 12 times.
+  for (let i = 0; i < secretArray.length; i++) { // loop for each code
+    let code = secretArray[i];
+    for (let j = 0; j < guessArray.length; j++) { // loop for each guess
+      let guess = guessArray[j];
 
-function init() {
-  codeMaker();
-  codeBreaker();
+      if (code != "" && guess != "" && code === guess) { // only compare if there is a value in the array
+        // if there is a match, remove from arrays and push "1" to score.
+        secretArray[i] = "";
+        guessArray[j] = "";
+        validatedScore.push(1);
+        break;
+      } else {
+        // console.log("XX Doesn't match");
+      }
+    }
+  }
+  return validatedScore;
 }
-
-init();
-
-console.log(codemaker);
