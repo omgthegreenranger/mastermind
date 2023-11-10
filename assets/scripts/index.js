@@ -1,8 +1,12 @@
+// frontend game interactive board script.
+
 import { codeMaker, codeBreaker } from "./board.js";
 
-
-// const codebreaker = [];
 const base_colours = [];
+
+
+// create array for six colours taken from CSS sheet.
+// we can change this as required to make it a matching game for anything you want.
 
 for (let i = 0; i < 6; i++) {
   let colour = "--colour" + i + "";
@@ -12,85 +16,70 @@ for (let i = 0; i < 6; i++) {
 }
 console.log("BASE COLOURS", base_colours);
 
-// code has 4 pegs
 
-// let choice1 = getComputedStyle(document.documentElement).getPropertyValue(
-//   "--choice1"
-// );
-// let choice2 = getComputedStyle(document.documentElement).getPropertyValue(
-//   "--choice2"
-// );
-// let choice3 = getComputedStyle(document.documentElement).getPropertyValue(
-//   "--choice3"
-// );
-// let choice4 = getComputedStyle(document.documentElement).getPropertyValue(
-//   "--choice4"
-// );
-
-// let submitRow = [choice1, choice2, choice3, choice4];
-
-async function handleSubmit() {
+async function handleSubmit() { // script to handle submit of guess
   let codeGuess = [];
   let sel_Array = [];
   let pickID;
   sel_Array = document.getElementsByName("colour-select");
-  for (let i = 0; i < sel_Array.length; i++) {
+
+
+  for (let i = 0; i < sel_Array.length; i++) {   // quick validation that no options left blank
     if (!sel_Array[i].value) {
-      // stop if no colour was chosen
-      console.log("Waaaaitaminute!");
+      // stop if no colour was chosen and set the pickID value
       pickID = "choice" + (i + 1);
-      console.log(pickID);
       let square = document.getElementById(pickID);
-      square.classList.add("not-picked");
-      // square.innerHTML = `<span>PICK PLEASE<span>`;
+      square.classList.add("not-picked"); // change style of box to whatever.
     } else {
-      // or continue
+
+      // or continue and push option to the codeGuess array.
       codeGuess.push(parseInt(sel_Array[i].value));
       continue;
     }
   }
-  console.log(codeGuess);
-  if (pickID) {
+
+  if (pickID) { // stop your submittin'!
     return;
   } else {
-    let response = await codeBreaker(codeGuess)
-    // codebreaker.push(response[0]);
-    // localStorage.setItem("CodeGame", JSON.stringify(response))
-    scoreBoard(false);
-    boardReset();
+    // run codeBreaker function to evaluate score. That script will set localstorage, no need here.
+    await codeBreaker(codeGuess);
+    
+    scoreBoard(false); // send note to scoreboard to generate round history, and prevent reset.
+    boardReset(); // reset selection boxes to base for next round.
   }
 }
 
-function handleReset() {
-  localStorage.clear("CodeGame");
+
+function handleReset() { // function to handle clicking "Reset Game" button
+  // clears history, resets scoreboard, and runs init again.
+  localStorage.clear(); 
   scoreBoard(true);
   init();
 }
 
-function handlePick() {
-  // console.log(event.target.previousSibling.previousSibling.style);
+function handlePick() { // change box of guess to selected value (colour, in this case)
   let boardBox = event.target.previousSibling.previousSibling;
   let pickStyle = "--colour" + event.target.value;
   boardBox.style.setProperty("background-color", `var(${pickStyle})`);
 }
 
-function boardCreate() {
-  // get elements for creation
+function boardCreate() { // starts board init creation
+  // sets round to "1" and moves to full board reset.
   let roundCount = document.getElementById("round-counter");
   roundCount.innerHTML = `Round 1 of 12`;
   boardReset();
 }
 
-function boardReset() {
-  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"))
-  let board = document.getElementById("choiceBox");
+function boardReset() { // this fully rebuilds the selection board, both on init() AND submit.
+  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
+  let choiceBox = document.getElementById("choiceBox");
   let button = document.getElementById("buttonField");
   if (codebreaker && codebreaker.length === 12) {
-    board.innerHTML = `
+    choiceBox.innerHTML = `
     <div class="option-box" style="display:none"></div>`;
     button.innerHTML = `<button class="submit" name="reset" type="button" id="reset">Submit Round</button>`;
   } else {
-    board.innerHTML = `
+    choiceBox.innerHTML = `
   <div class="option-box">
   <div class="colour choice" id="choice1">&nbsp;</div>
     <select name="colour-select" id="selector1">
@@ -153,46 +142,51 @@ function boardReset() {
     .addEventListener("click", () => handleReset());
 }
 
-function scoreBoard(reset) {
-    // get HTML elements for display
+function scoreBoard(reset) { // builds the score history in 12 rounds. Also handles win and loss display when relevant.
+  // get HTML elements for display
   let rounds = document.getElementById("rounds");
   let roundCount = document.getElementById("round-counter");
   let roundsBoard = document.getElementById("roundsBoard");
   let scoreBox = document.getElementById("score-box");
-  
-  if(reset === true) {
-    rounds.innerHTML ="";
-    roundCount.innerHTML = "Round 1 of 12";
-    roundsBoard.innerHTML = "";
-  } else if(reset === false) {
-  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"))
+  let board = document.getElementById("board");
 
-  roundCount.innerHTML = `${codebreaker.length + 1} of 12`;
-  // console.log(codebreaker);
-  if (codebreaker.length < 12) {
-    // display round
-
-    // scoreboard history
-    roundsBoard.innerHTML = "";
-    codebreaker.forEach((round, i) => {
-      // let scoreRound = i;
-      // console.log(round);
-      let scoreColours = round[0];
-      let scoreTick = round[1];
+  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
+  if (reset === true) {
+      rounds.innerHTML = "";
+      roundCount.innerHTML = "Round 1 of 12";
+      roundsBoard.innerHTML = "";
+    } else if (reset === false) {
+      let winCond = codebreaker[codebreaker.length - 1][2];
+      console.log(winCond);
+      if (winCond === 2) {
+        board.innerHTML = `<div>WON THE GAME</div>
+      <button class="submit" name="reset" type="button" id="start">Start Again</button>`;
+      document
+      .getElementById("start")
+      .addEventListener("click", () => init());
+      } else {
+      console.log(codebreaker, codebreaker[codebreaker.length - 1]);
+      roundCount.innerHTML = `${codebreaker.length + 1} of 12`;
       // console.log(codebreaker);
-      // console.log(scoreColours);
-      // console.log(scoreTick);
+      if (codebreaker.length < 12) {
+        // display round
 
-      function scoreTicker(tick) {
-        if (tick === 2) {
-          return "background-color: white";
-        } else if (tick === 1) {
-          return "background-color: red";
-        } else {
-          return "display: none";
-        }
-      }
-      roundsBoard.innerHTML += `<div class="rounds-round" id="rounds"><div class="colour-options">
+        // scoreboard history
+        roundsBoard.innerHTML = "";
+        codebreaker.forEach((round, i) => {
+          let scoreColours = round[0];
+          let scoreTick = round[1];
+
+          function scoreTicker(tick) {
+            if (tick === 2) {
+              return "background-color: white";
+            } else if (tick === 1) {
+              return "background-color: red";
+            } else {
+              return "display: none";
+            }
+          }
+          roundsBoard.innerHTML += `<div class="rounds-round" id="rounds"><div class="colour-options">
     <div class="colour choice" style="background-color: var(--colour${
       scoreColours[0]
     })">Hello</div>
@@ -213,18 +207,18 @@ function scoreBoard(reset) {
     <div class="tick" style="${scoreTicker(scoreTick[3])}">${scoreTick[3]}</div>
     </div></div>
     `;
-    });
-  } else {
-    rounds.innerHTML = "GAME OVER";
+        });
+      } else {
+        rounds.innerHTML = "GAME OVER";
+      }
+    }
   }
-}
 }
 
 function init() {
+  localStorage.clear();
   boardCreate();
   codeMaker();
-  // devSolve(); this is the dev to display solution on the board - keep off in prod
-  // codeBreaker();
 }
 
 init();
