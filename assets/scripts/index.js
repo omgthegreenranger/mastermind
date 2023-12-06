@@ -14,7 +14,6 @@ for (let i = 0; i < 6; i++) {
     getComputedStyle(document.documentElement).getPropertyValue(colour)
   );
 }
-console.log("BASE COLOURS", base_colours);
 
 
 async function handleSubmit() { // script to handle submit of guess
@@ -157,7 +156,6 @@ function scoreBoard(reset) { // builds the score history in 12 rounds. Also hand
       roundsBoard.innerHTML = "";
     } else if (reset === false) {
       let winCond = codebreaker[codebreaker.length - 1][2];
-      console.log(winCond);
       if (winCond === 2) {
         board.innerHTML = `<div>WON THE GAME</div>
       <button class="submit" name="reset" type="button" id="start">Start Again</button>`;
@@ -165,9 +163,7 @@ function scoreBoard(reset) { // builds the score history in 12 rounds. Also hand
       .getElementById("start")
       .addEventListener("click", () => init());
       } else {
-      console.log(codebreaker, codebreaker[codebreaker.length - 1]);
       roundCount.innerHTML = `${codebreaker.length + 1} of 12`;
-      // console.log(codebreaker);
       if (codebreaker.length < 12) {
         // display round
 
