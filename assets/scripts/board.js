@@ -45,7 +45,7 @@ export function codeBreaker(guessArray) {
     if (score[i] === 2) {
       winState = 2;
       continue;
-    } else if (score[i] != 2) {
+    } else if (score[i] !== 2) {
       winState = 1;
       break;
     } else if (round === 12) {
@@ -99,7 +99,7 @@ function codeMissing(guessArray, secretArray, validatedScore) {
       // loop for each guess
       let guess = guessArray[j];
 
-      if (code != "" && guess != "" && code === guess) {
+      if (code !== "" && guess !== "" && code === guess) {
         // only compare if there is a value in the array
         // if there is a match, remove from arrays and push "1" to score.
         secretArray[i] = "";
