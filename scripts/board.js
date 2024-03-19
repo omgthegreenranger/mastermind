@@ -3,27 +3,30 @@
 // set arrays for game.
 
 // set constants
-const codemaker = ["", "", "", ""];
+
 const choiceCount = 6; // this will be an adjustable option later
 
 export function codeMaker() {
+  const code = ['', '', '', ''];
   // get the codemaker's secret code
   for (let i = 0; i < 4; i++) {
     let codeChoice = Math.floor(Math.random() * choiceCount);
-    codemaker[i] = codeChoice;
+    code[i] = codeChoice;
   }
-  // console.log("Solution", codemaker);
+  console.log("Solution", code);
+  return code;
 }
 
-export function codeBreaker(guessArray) {
+export function codeBreaker(guessArray, codemaker) {
   // begin the game; allow the codebreaker to begin guessing
-  // console.log("CodeBreaker function ", codemaker);
+
+  console.log("Secret Code", codemaker);
+  console.log("Guess Array", guessArray);
 
   // Set variables
   let codebreaker = JSON.parse(localStorage.getItem("CodeGame")); // the ongoing guess history in local storage. Get that.
   let winState; // did they win in this round?
   let round; // get the round array from the guessing history.
-
   // if there is no history, set base round to 1.
   if (!codebreaker) {
     codebreaker = [];
@@ -36,7 +39,7 @@ export function codeBreaker(guessArray) {
   }
   
   // the following two variables create temp arrays of the secret and guessed code, so we can mess with them
-  let secretArray = JSON.parse(JSON.stringify(codemaker)); 
+  let secretArray = structuredClone(codemaker); 
   let roundGuess = JSON.parse(JSON.stringify(guessArray)); 
 
   // run scoring functions to determine... score...
@@ -58,7 +61,7 @@ export function codeBreaker(guessArray) {
 
   // push to the history array and return to localStorage
   codebreaker.push([roundGuess, score, winState, round]);
-  // console.log("Codebreaker", codebreaker);
+  console.log("Codebreaker", codebreaker);
   localStorage.setItem("CodeGame", JSON.stringify(codebreaker));
   return codebreaker;
 }
@@ -73,7 +76,7 @@ function codeExact(guessArray, secretArray) {
 
   let validatedScore = []; // temp array for score result. Note that it is _not_ positional to the code, just a list of scores.
 
-  console.log("*** Begin exact validation ***");
+  console.log("*** Begin exact validation ***", secretArray);
   
   // console.log("EXACT DATA SET: ", guessArray, secretArray, validatedScore);
   
@@ -106,7 +109,7 @@ function codeMissing(guessArray, secretArray, validatedScore) {
     for (let j = 0; j < guessArray.length; j++) { // loop for each guess
       let guess = guessArray[j];
 
-      if (code != "" && guess != "" && code === guess) { // only compare if there is a value in the array
+      if (code !== "" && guess !== "" && code === guess) { // only compare if there is a value in the array
         // if there is a match, remove from arrays and push "1" to score.
         secretArray[i] = "";
         guessArray[j] = "";
