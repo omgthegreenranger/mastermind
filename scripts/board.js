@@ -74,7 +74,7 @@ export function codeBreaker(guessArray, codemaker) {
 function codeExact(guessArray, secretArray) { 
   //We start by calculating all EXACT MATCHES (where guess is correct and in right position) and removing them from the arrays.
 
-  let validatedScore = []; // temp array for score result. Note that it is _not_ positional to the code, just a list of scores.
+  let validatedScore = [0,0,0,0]; // temp array for score result. Note that it is _not_ positional to the code, just a list of scores.
 
   console.log("*** Begin exact validation ***", secretArray);
   
@@ -89,7 +89,7 @@ function codeExact(guessArray, secretArray) {
       // if the choice and position match, clear value from array and push "2" to score
       secretArray[i] = "";
       guessArray[i] = "";
-      validatedScore.push(2);
+      validatedScore[i] = 2;
     } else {
       // console.log("XX Doesn't match");
     }
@@ -113,7 +113,7 @@ function codeMissing(guessArray, secretArray, validatedScore) {
         // if there is a match, remove from arrays and push "1" to score.
         secretArray[i] = "";
         guessArray[j] = "";
-        validatedScore.push(1);
+        validatedScore[i] = 1;
         break;
       } else {
         // console.log("XX Doesn't match");
