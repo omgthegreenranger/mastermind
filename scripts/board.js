@@ -10,7 +10,7 @@ export function codeMaker() {
   const code = ['', '', '', ''];
   // get the codemaker's secret code
   for (let i = 0; i < 4; i++) {
-    let codeChoice = Math.floor(Math.random() * choiceCount);
+    let codeChoice = Math.floor(Math.random() * choiceCount); 
     code[i] = codeChoice;
   }
   console.log("Solution", code);
