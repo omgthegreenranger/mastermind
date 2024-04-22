@@ -1,0 +1,91 @@
+:root {
+    --colour0: red;
+    --colour1: orange;
+    --colour2: yellow;
+    --colour3: green;
+    --colour4: blue;
+    --colour5: violet;
+}
+
+.options {
+    display: flex;
+}
+.colour-options {
+    display: flex;
+    list-style-type: none;
+}
+.rounds-round {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
+
+.rounds-board {
+    display: flex;
+    flex-direction:column;
+
+}
+.rounds-score {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
+.not-picked {
+    border: 2px red solid!important;
+}
+.colour {
+    padding: 10px;
+    width:100%;
+}
+
+.choice {
+    border: 1px solid blue;
+    width:100%;
+    background-color: grey;
+
+}
+
+.scoreTick {
+    display: flex;
+    flex: row 2 2;
+}
+
+
+/* #selector-modal {
+    display: none;
+} */
+
+/* #choice1 {
+}
+
+#choice2 {
+
+}
+
+#choice3 {
+
+}
+
+#choice4 {
+
+} */
+
+
+
+#colour1 { 
+    background-color: var(--colour1);}
+
+#colour2 { 
+    background-color: var(--colour2);}
+
+#colour3 { 
+    background-color: var(--colour3);}
+
+#colour4 { 
+    background-color: var(--colour4);}
+
+#colour5 { 
+    background-color: var(--colour5);}
+
+#colour6 { 
+    background-color: var(--colour6);}
