@@ -5,6 +5,7 @@
 // set constants
 
 const choiceCount = 6; // this will be an adjustable option later
+const roundCount = 12; // this will be an adjustable option later
 
 export function codeMaker() {
   const code = ['', '', '', ''];
