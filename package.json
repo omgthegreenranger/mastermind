@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/omgthegreenranger/mastermind/issues"
   },
-  "homepage": "https://github.com/omgthegreenranger/mastermind#readme"
+  "homepage": "https://github.com/omgthegreenranger/mastermind#readme",
+  "dependencies": {
+    "jest": "^29.7.0"
+  }
 }
