@@ -10,6 +10,25 @@
     <header></header>
     <main>
       <section class="game">
+        <section class="options">
+          <label>Size of Puzzle:</label>
+          <select name="choices" id="choice-count">
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+          </select>
+          <label>No. of Rounds:</label>
+          <select name="round-num" id="round-num">
+            <option value="r-12">12</option>
+            <option value="r-15">15</option>
+            <option value="r-18">18</option>
+            <option value="r-24">24</option>
+          </select>
+          </select>
+          <input type="button" id="startGame" value="Start Game!">
+        </section>
         <section class="status">
           <div class="round-counter" id="round-counter"># of 12</div>
         </section>

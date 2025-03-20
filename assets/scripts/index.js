@@ -3,7 +3,7 @@
 import { codeMaker, codeBreaker } from "./logic.js";
 
 const base_colours = [];
-
+document.getElementById('startGame').onclick = init;
 
 // create array for six colours taken from CSS sheet.
 // we can change this as required to make it a matching game for anything you want.

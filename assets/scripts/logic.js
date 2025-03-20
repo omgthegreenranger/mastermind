@@ -2,12 +2,13 @@
 // NONE OF THIS SCRIPT ACCESSES FRONT-END INFORMATION - ALL IS PASSED VIA VARIABLE
 // All we are doing with these scripts is the logic, scoring, and win check.
 
-const choiceCount = 6; // this will be an adjustable option later
+// const choiceCount = 6; // this will be an adjustable option later
 
-export function codeMaker() {
-  const codemaker = ["", "", "", ""];
+export function codeMaker(choiceCount) {
+
+  const codemaker = [];
   // get the codemaker's secret code
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < choiceCount; i++) {
     let codeChoice = Math.floor(Math.random() * choiceCount);
     codemaker[i] = codeChoice;
   }
