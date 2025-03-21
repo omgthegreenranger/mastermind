@@ -1,13 +1,12 @@
 // frontend game interactive board script.
 
 import { codeMaker, codeBreaker } from "./logic.js";
-import "./board.js";
 
 const base_colours = [];
 
-document.getElementById('startGame').onclick = gameStart; // create array for six colours taken from CSS sheet.
 
-
+// create array for six colours taken from CSS sheet.
+// we can change this as required to make it a matching game for anything you want.
 
 for (let i = 0; i < 6; i++) {
   let colour = "--colour" + i + "";
@@ -23,8 +22,7 @@ async function handleSubmit() { // script to handle submit of guess
   let sel_Array = [];
   let pickID;
   sel_Array = document.getElementsByName("colour-select");
-  let gameSolution = JSON.parse(localStorage.getItem("gameSolution"))
-  let gameHistory = localStorage.getItem("gameHistory")
+
 
   for (let i = 0; i < sel_Array.length; i++) {   // quick validation that no options left blank
     if (!sel_Array[i].value) {
@@ -43,11 +41,9 @@ async function handleSubmit() { // script to handle submit of guess
   if (pickID) { // stop your submittin'!
     return;
   } else {
+    // run codeBreaker function to evaluate score. That script will set localstorage, no need here.
+    await codeBreaker(codeGuess);
     
-    let gameArray = [gameHistory,codeGuess,gameSolution]
-    let gameRound = await codeBreaker(gameArray);
-    console.log(gameRound)
-    localStorage.setItem("gameHistory", JSON.stringify(gameRound[0]))
     scoreBoard(false); // send note to scoreboard to generate round history, and prevent reset.
     boardReset(); // reset selection boxes to base for next round.
   }
@@ -56,6 +52,7 @@ async function handleSubmit() { // script to handle submit of guess
 
 function handleReset() { // function to handle clicking "Reset Game" button
   // clears history, resets scoreboard, and runs init again.
+  localStorage.clear(); 
   scoreBoard(true);
   init();
 }
@@ -66,10 +63,10 @@ function handlePick() { // change box of guess to selected value (colour, in thi
   boardBox.style.setProperty("background-color", `var(${pickStyle})`);
 }
 
-function boardCreate(roundNum) { // starts board init creation
+function boardCreate() { // starts board init creation
   // sets round to "1" and moves to full board reset.
   let roundCount = document.getElementById("round-counter");
-  // roundCount.innerHTML = `Round 1 of ${roundNum}`;
+  roundCount.innerHTML = `Round 1 of 12`;
   boardReset();
 }
 
@@ -77,7 +74,7 @@ function boardReset() { // this fully rebuilds the selection board, both on init
   let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
   let choiceBox = document.getElementById("choiceBox");
   let button = document.getElementById("buttonField");
-  if (codebreaker && codebreaker.length === roundNum) {
+  if (codebreaker && codebreaker.length === 12) {
     choiceBox.innerHTML = `
     <div class="option-box" style="display:none"></div>`;
     button.innerHTML = `<button class="submit" name="reset" type="button" id="reset">Submit Round</button>`;
@@ -153,7 +150,7 @@ function scoreBoard(reset) { // builds the score history in 12 rounds. Also hand
   let scoreBox = document.getElementById("score-box");
   let board = document.getElementById("board");
 
-  let codebreaker = JSON.parse(localStorage.getItem("gameHistory"));
+  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
   if (reset === true) {
       rounds.innerHTML = "";
       roundCount.innerHTML = "Round 1 of 12";
@@ -218,20 +215,10 @@ function scoreBoard(reset) { // builds the score history in 12 rounds. Also hand
   }
 }
 
-function gameStart() {
-  localStorage.clear();
-  const roundNum = parseInt(document.getElementById("round-num").value.split("-")[1]);
-  const choiceCount = parseInt(document.getElementById("choice-count").value)
-  let solution = codeMaker(choiceCount, roundNum);
-  localStorage.setItem("gameSolution", JSON.stringify(solution))
-  localStorage.setItem("gameHistory",null)
-  localStorage.setItem("roundCount", roundNum);
-  boardCreate(roundNum);
-  console.log(choiceCount, roundNum)
-}
-
 function init() {
-
+  localStorage.clear();
+  boardCreate();
+  codeMaker();
 }
 
 init();
