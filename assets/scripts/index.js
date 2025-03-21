@@ -5,7 +5,6 @@ import { codeMaker, codeBreaker } from "./logic.js";
 const base_colours = [];
 
 document.getElementById('startGame').onclick = gameStart;
-
 // create array for six colours taken from CSS sheet.
 // we can change this as required to make it a matching game for anything you want.
 
@@ -67,10 +66,10 @@ function handlePick() { // change box of guess to selected value (colour, in thi
   boardBox.style.setProperty("background-color", `var(${pickStyle})`);
 }
 
-function boardCreate() { // starts board init creation
+function boardCreate(roundNum) { // starts board init creation
   // sets round to "1" and moves to full board reset.
   let roundCount = document.getElementById("round-counter");
-  roundCount.innerHTML = `Round 1 of 12`;
+  // roundCount.innerHTML = `Round 1 of ${roundNum}`;
   boardReset();
 }
 
@@ -78,7 +77,7 @@ function boardReset() { // this fully rebuilds the selection board, both on init
   let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
   let choiceBox = document.getElementById("choiceBox");
   let button = document.getElementById("buttonField");
-  if (codebreaker && codebreaker.length === 12) {
+  if (codebreaker && codebreaker.length === roundNum) {
     choiceBox.innerHTML = `
     <div class="option-box" style="display:none"></div>`;
     button.innerHTML = `<button class="submit" name="reset" type="button" id="reset">Submit Round</button>`;
@@ -221,21 +220,24 @@ function scoreBoard(reset) { // builds the score history in 12 rounds. Also hand
 
 function gameStart() {
   localStorage.clear();
-  boardCreate();
   const roundNum = parseInt(document.getElementById("round-num").value.split("-")[1]);
   const choiceCount = parseInt(document.getElementById("choice-count").value)
   let solution = codeMaker(choiceCount, roundNum);
   localStorage.setItem("gameSolution", JSON.stringify(solution))
   localStorage.setItem("gameHistory",null)
-  console.log(choiceCount)
+  localStorage.setItem("roundCount", roundNum);
+  boardCreate(roundNum);
+  console.log(choiceCount, roundNum)
 }
 
-function init() {
-  localStorage.clear();
-  boardCreate();
-  let solution = codeMaker();
-  localStorage.setItem("gameSolution", JSON.stringify(solution))
-  localStorage.setItem("gameHistory",null)
-}
+// function init() {
+//   localStorage.clear();
+//   roundNum = parseInt(document.getElementById("round-num").value.slice("-")[1]);
+//   console.log(roundNum)
+//   boardCreate();
+//   let solution = codeMaker();
+//   localStorage.setItem("gameSolution", JSON.stringify(solution))
+//   localStorage.setItem("gameHistory",null)
+// }
 
-init();
+// init();
