@@ -3,10 +3,12 @@
 import { codeMaker, codeBreaker } from "./logic.js";
 
 const base_colours = [];
-document.getElementById('startGame').onclick = init;
+
+document.getElementById('startGame').onclick = gameStart;
 
 // create array for six colours taken from CSS sheet.
 // we can change this as required to make it a matching game for anything you want.
+
 
 for (let i = 0; i < 6; i++) {
   let colour = "--colour" + i + "";
@@ -215,6 +217,17 @@ function scoreBoard(reset) { // builds the score history in 12 rounds. Also hand
       }
     }
   }
+}
+
+function gameStart() {
+  localStorage.clear();
+  boardCreate();
+  const roundNum = parseInt(document.getElementById("round-num").value.split("-")[1]);
+  const choiceCount = parseInt(document.getElementById("choice-count").value)
+  let solution = codeMaker(choiceCount, roundNum);
+  localStorage.setItem("gameSolution", JSON.stringify(solution))
+  localStorage.setItem("gameHistory",null)
+  console.log(choiceCount)
 }
 
 function init() {

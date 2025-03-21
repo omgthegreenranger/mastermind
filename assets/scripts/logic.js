@@ -2,17 +2,16 @@
 // NONE OF THIS SCRIPT ACCESSES FRONT-END INFORMATION - ALL IS PASSED VIA VARIABLE
 // All we are doing with these scripts is the logic, scoring, and win check.
 
-// const choiceCount = 6; // this will be an adjustable option later
-
-export function codeMaker(choiceCount) {
-
+var roundLimit; 
+export function codeMaker(choiceCount, roundCount) {   // get the codemaker's secret code
   const codemaker = [];
-  // get the codemaker's secret code
+  roundLimit = roundCount;
+  console.log(choiceCount)
   for (let i = 0; i < choiceCount; i++) {
     let codeChoice = Math.floor(Math.random() * choiceCount);
     codemaker[i] = codeChoice;
   }
-  console.log("Solution", codemaker);
+  console.log("Solution", codemaker, roundLimit);
   return codemaker
 }
 
@@ -23,6 +22,7 @@ export function codeBreaker(gameArray) {
   // gameHistory = [[gameRound, [roundGuess], [gameScore]]]
   // gameArray = {[gameHistory], [currentGuess], [gameSolution], winState}
   console.log(gameArray)
+  console.log(roundLimit)
 
   let gameHistory = JSON.parse(gameArray[0]); // the ongoing guess history in local storage. Get that.
   let winState; // did they win in this round?

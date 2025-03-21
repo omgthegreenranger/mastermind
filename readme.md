@@ -17,8 +17,12 @@ Based on the original game designed in 1970, the rules are simple.
 ### Using this code
 
 The actual evaluation and generative code is *assets/scripts/board.js**. This includes two exported functions:
-- **codeMaker()** - call this function to generate the secret code.
-- **codeBreaker(guessArray)** - this function requires the selected guess array.
+- **codeMaker(N)** - call this function to generate the secret code, using "N" as number of digits in the code. Will return an array with that length.
+- **codeBreaker(Array)** - calling this function requires the selected guess array.
+    - the array should contain:
+        - *gameHistory* an array that contains each previous round (the script will compile this each round and return it to you)
+        - *currentGuess* as an array of options that the user has selected.
+        - *gameSolution* the solution string
 
 The evaluated score for each round will be appended to LocalStorage as "CodeGame" as an array with the following elements:
 - *roundGuess* - the original guessArray
