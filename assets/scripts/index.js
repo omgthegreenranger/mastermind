@@ -1,28 +1,44 @@
 // frontend game interactive board script.
 
-import { codeMaker, codeBreaker } from "./board.js";
+import { codeMaker, codeBreaker } from "./logic.js";
+import { settingsPanel, boardTemplate, historyBoard, statusBar} from "./board.js";
 
 const base_colours = [];
 
+const game = document.getElementById('game');
+const settings = document.getElementById('settings');
+const board = document.getElementById('board');
+const statusInfo = document.getElementById('status');
+const history = document.getElementById('history')
 
-// create array for six colours taken from CSS sheet.
-// we can change this as required to make it a matching game for anything you want.
+var roundCount;
+var roundLimit;
+var choiceCount;
 
-for (let i = 0; i < 6; i++) {
+for (let i = 0; i < 6; i++) { // define the colours array
   let colour = "--colour" + i + "";
   base_colours.push(
     getComputedStyle(document.documentElement).getPropertyValue(colour)
   );
 }
-console.log("BASE COLOURS", base_colours);
 
+function addListeners() {
+  // const choiceBox = document.getElementById('choice-box');
+  document.getElementById('choice-box').addEventListener("input", handlePick);
+  document.getElementById('startGame').addEventListener("click",() => handleReset()); // create array for six colours taken from CSS sheet.
+  // document
+  //   .getElementById("submit")
+  //   .addEventListener("click", () => handleSubmit(choiceCount, roundCount));
+  document.getElementById('startGame').addEventListener("click",() => handleReset()); // create array for six colours taken from CSS sheet.
 
-async function handleSubmit() { // script to handle submit of guess
+}
+
+async function handleSubmit(choiceCount, roundCount, roundLimit) { // script to handle submit of guess
   let codeGuess = [];
-  let sel_Array = [];
   let pickID;
-  sel_Array = document.getElementsByName("colour-select");
-
+  let sel_Array = document.getElementsByName("colour-select");
+  let gameSolution = JSON.parse(localStorage.getItem("gameSolution"))
+  let gameHistory = localStorage.getItem("gameHistory")
 
   for (let i = 0; i < sel_Array.length; i++) {   // quick validation that no options left blank
     if (!sel_Array[i].value) {
@@ -31,7 +47,6 @@ async function handleSubmit() { // script to handle submit of guess
       let square = document.getElementById(pickID);
       square.classList.add("not-picked"); // change style of box to whatever.
     } else {
-
       // or continue and push option to the codeGuess array.
       codeGuess.push(parseInt(sel_Array[i].value));
       continue;
@@ -41,20 +56,11 @@ async function handleSubmit() { // script to handle submit of guess
   if (pickID) { // stop your submittin'!
     return;
   } else {
-    // run codeBreaker function to evaluate score. That script will set localstorage, no need here.
-    await codeBreaker(codeGuess);
-    
-    scoreBoard(false); // send note to scoreboard to generate round history, and prevent reset.
-    boardReset(); // reset selection boxes to base for next round.
+    let gameArray = [gameHistory, codeGuess, gameSolution]
+    let gameRound = await codeBreaker(gameArray);
+    localStorage.setItem("gameHistory", JSON.stringify(gameRound[0]))
+    boardReset(choiceCount, roundCount, roundLimit); // reset selection boxes to base for next round.
   }
-}
-
-
-function handleReset() { // function to handle clicking "Reset Game" button
-  // clears history, resets scoreboard, and runs init again.
-  localStorage.clear(); 
-  scoreBoard(true);
-  init();
 }
 
 function handlePick() { // change box of guess to selected value (colour, in this case)
@@ -63,117 +69,58 @@ function handlePick() { // change box of guess to selected value (colour, in thi
   boardBox.style.setProperty("background-color", `var(${pickStyle})`);
 }
 
-function boardCreate() { // starts board init creation
-  // sets round to "1" and moves to full board reset.
-  let roundCount = document.getElementById("round-counter");
-  roundCount.innerHTML = `Round 1 of 12`;
-  boardReset();
+function handleReset() { // function to handle clicking "Reset Game" button
+  // clears history, resets scoreboard, and runs init again.
+  localStorage.clear();
+  scoreBoard(true);
+  // document.getElementById('startGame').addEventListener("click",() => handleReset()); // create array for six colours taken from CSS sheet.
+  gameStart();
 }
 
-function boardReset() { // this fully rebuilds the selection board, both on init() AND submit.
-  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
-  let choiceBox = document.getElementById("choiceBox");
-  let button = document.getElementById("buttonField");
-  if (codebreaker && codebreaker.length === 12) {
-    choiceBox.innerHTML = `
-    <div class="option-box" style="display:none"></div>`;
-    button.innerHTML = `<button class="submit" name="reset" type="button" id="reset">Submit Round</button>`;
-  } else {
-    choiceBox.innerHTML = `
-  <div class="option-box">
-  <div class="colour choice" id="choice1">&nbsp;</div>
-    <select name="colour-select" id="selector1">
-      <option value="" defaultSelected>Pick Colour</option>
-      <option value=0 id="1">${base_colours[0]}</option>
-      <option value=1 id="2">${base_colours[1]}</option>
-      <option value=2 id="3">${base_colours[2]}</option>
-      <option value=3 id="4">${base_colours[3]}</option>
-      <option value=4 id="5">${base_colours[4]}</option>
-      <option value=5 id="6">${base_colours[5]}</option>
-    </select>
-  </div>
-  <div class="option-box">
-    <div class="colour choice" id="choice2">&nbsp;</div>
-    <select name="colour-select" id="selector2">
-      <option value="" defaultSelected>Pick Colour</option>
-      <option value=0 id="1">${base_colours[0]}</option>
-      <option value=1 id="2">${base_colours[1]}</option>
-      <option value=2 id="3">${base_colours[2]}</option>
-      <option value=3 id="4">${base_colours[3]}</option>
-      <option value=4 id="5">${base_colours[4]}</option>
-      <option value=5 id="6">${base_colours[5]}</option>
-    </select>
-  </div>
-  <div class="option-box">
-    <div class="colour choice" id="choice3">&nbsp;</div>
-    <select name="colour-select" id="selector3">
-    <option value="" defaultSelected>Pick Colour</option>
-    <option value=0 id="1">${base_colours[0]}</option>
-    <option value=1 id="2">${base_colours[1]}</option>
-    <option value=2 id="3">${base_colours[2]}</option>
-    <option value=3 id="4">${base_colours[3]}</option>
-    <option value=4 id="5">${base_colours[4]}</option>
-    <option value=5 id="6">${base_colours[5]}</option>
-    </select>
-  </div>
-  <div class="option-box">
-    <div class="colour choice" id="choice4">&nbsp;</div>
-    <select name="colour-select" id="selector4">
-    <option value="" defaultSelected>Pick Colour</option>
-    <option value=0 id="1">${base_colours[0]}</option>
-    <option value=1 id="2">${base_colours[1]}</option>
-    <option value=2 id="3">${base_colours[2]}</option>
-    <option value=3 id="4">${base_colours[3]}</option>
-    <option value=4 id="5">${base_colours[4]}</option>
-    <option value=5 id="6">${base_colours[5]}</option>
-    </select>
-  </div>`;
-    button.innerHTML = `<button class="submit" name="submit" type="button" id="submit">Submit Round</button>
-  <button class="submit" name="reset" type="button" id="reset">Reset Game</button>`;
-  }
-
-  let choiceBoxes = document.getElementById("choiceBox");
-  choiceBoxes.addEventListener("input", handlePick);
-  document
+function boardReset(choiceCount, roundCount) { // this fully rebuilds the selection board, both on init() AND submit.
+  console.log(choiceCount, roundCount, roundLimit)
+  const args = [game, board, statusInfo, localStorage.getItem("gameHistory"), base_colours, choiceCount, roundCount, roundLimit];
+  settings.innerHTML = settingsPanel();
+  statusInfo.innerHTML = statusBar(args[6], args[7])
+  game.innerHTML = boardTemplate(args);
+  history.innerHTML = historyBoard(args[3])
+  addListeners();
+    document
     .getElementById("submit")
-    .addEventListener("click", () => handleSubmit());
-  document
-    .getElementById("reset")
-    .addEventListener("click", () => handleReset());
+    .addEventListener("click", () => handleSubmit(choiceCount, roundCount));
 }
 
-function scoreBoard(reset) { // builds the score history in 12 rounds. Also handles win and loss display when relevant.
+function scoreBoard(reset, roundCount, roundLimit) { // builds the score history in 12 rounds. Also handles win and loss display when relevant.
   // get HTML elements for display
+  console.log(roundCount, roundLimit)
   let rounds = document.getElementById("rounds");
-  let roundCount = document.getElementById("round-counter");
   let roundsBoard = document.getElementById("roundsBoard");
   let scoreBox = document.getElementById("score-box");
   let board = document.getElementById("board");
 
-  let codebreaker = JSON.parse(localStorage.getItem("CodeGame"));
+  let codebreaker = JSON.parse(localStorage.getItem("gameHistory"));
   if (reset === true) {
-      rounds.innerHTML = "";
-      roundCount.innerHTML = "Round 1 of 12";
-      roundsBoard.innerHTML = "";
-    } else if (reset === false) {
-      let winCond = codebreaker[codebreaker.length - 1][2];
-      console.log(winCond);
-      if (winCond === 2) {
-        board.innerHTML = `<div>WON THE GAME</div>
+
+  } else if (reset === false) {
+    console.log(codebreaker.reverse())
+    let winCond = codebreaker[codebreaker.length - 1][2];
+    console.log(winCond);
+    if (winCond === 2) {
+      board.innerHTML = `<div>WON THE GAME</div>
       <button class="submit" name="reset" type="button" id="start">Start Again</button>`;
       document
-      .getElementById("start")
-      .addEventListener("click", () => init());
-      } else {
-      console.log(codebreaker, codebreaker[codebreaker.length - 1]);
-      roundCount.innerHTML = `${codebreaker.length + 1} of 12`;
-      // console.log(codebreaker);
-      if (codebreaker.length < 12) {
-        // display round
+        .getElementById("start")
+        .addEventListener("click", () => init());
+    } else {
+      // console.log(codebreaker, codebreaker[codebreaker.length - 1]);
 
+      // console.log(codebreaker);
+      if (codebreaker.length < roundLimit) {
+
+        roundCount += 1
+        console.log(roundCount)
         // scoreboard history
-        roundsBoard.innerHTML = "";
-        codebreaker.forEach((round, i) => {
+        codebreaker.reverse().forEach((round, i) => {
           let scoreColours = round[0];
           let scoreTick = round[1];
 
@@ -186,39 +133,40 @@ function scoreBoard(reset) { // builds the score history in 12 rounds. Also hand
               return "display: none";
             }
           }
-          roundsBoard.innerHTML += `<div class="rounds-round" id="rounds"><div class="colour-options">
-    <div class="colour choice" style="background-color: var(--colour${
-      scoreColours[0]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(--colour${
-      scoreColours[1]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(--colour${
-      scoreColours[2]
-    })">Hello</div>
-    <div class="colour choice" style="background-color: var(--colour${
-      scoreColours[3]
-    })">Hello</div>
-    </div>
-    <div class="rounds-score" id="score-box"><div class="scoreTick">
-    <div class="tick" style="${scoreTicker(scoreTick[0])}">${scoreTick[0]}</div>
-    <div class="tick" style="${scoreTicker(scoreTick[1])}">${scoreTick[1]}</div>
-    <div class="tick" style="${scoreTicker(scoreTick[2])}">${scoreTick[2]}</div>
-    <div class="tick" style="${scoreTicker(scoreTick[3])}">${scoreTick[3]}</div>
-    </div></div>
-    `;
-        });
-      } else {
-        rounds.innerHTML = "GAME OVER";
+        })
       }
     }
   }
 }
 
-function init() {
+function gameStart() {
+
+  // clear storage and start the game again.
   localStorage.clear();
-  boardCreate();
-  codeMaker();
+  roundCount = 1;
+  roundLimit = parseInt(document.getElementById("round-num").value.split("-")[1]);
+  choiceCount = parseInt(document.getElementById("choice-count").value)
+  let solution = codeMaker(choiceCount, roundLimit);
+  localStorage.setItem("gameSolution", JSON.stringify(solution))
+  localStorage.setItem("gameHistory", null)
+  localStorage.setItem("round_limit", roundLimit);
+  
+  // create the game board.
+  boardReset(choiceCount, roundCount, roundLimit);
+  addListeners();
+  document
+    .getElementById("submit")
+    .addEventListener("click", () => handleSubmit(choiceCount, roundCount));
+  // document
+  //   .getElementById("startGame")
+  //   .addEventListener("click", () => handleReset());
+  console.log(choiceCount, roundLimit)
+}
+
+function init() {
+  settings.innerHTML = settingsPanel();
+  // addListeners();
+  document.getElementById('startGame').addEventListener("click",() => handleReset()); // create array for six colours taken from CSS sheet.
 }
 
 init();
